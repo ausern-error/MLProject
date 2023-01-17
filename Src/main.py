@@ -1,5 +1,4 @@
 import TwitScrape
-
-TwitScrape.get_tweets_as_csv("Sa", 10)
+TwitScrape.get_tweets_as_csv("lang:en", 10)
 
 
