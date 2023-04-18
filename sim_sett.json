@@ -1,0 +1,10 @@
+
+{
+"map_x":"700", "map_y":"700",
+"window_x":"700", "window_y":"700",
+"max_fps":"200",
+"tickrate":"64",
+"vsync":false,
+"bot_size":"1",
+"playback_spd":"1"
+}
