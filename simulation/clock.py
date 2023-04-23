@@ -9,6 +9,3 @@ class Clock:
         self.tick_counter += 1
         if self.tick_counter % self.day_length == 0:
             self.day_counter+=1
-            
-        
-        
