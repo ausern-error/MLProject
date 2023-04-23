@@ -7,7 +7,7 @@ class Vector2:
     y: int
 
 @dataclass
-class entity:
+class Entity:
     position: Vector2
     animal_type: str
     age: int
