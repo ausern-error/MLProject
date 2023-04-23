@@ -3,10 +3,10 @@ import os
 from os.path import exists
 keys = ["bot_name", "bot_size", "bot_prey", "bot_predator", "bot_reproduction_rate", "bot_adult_age"]
 
-
 def create_json(file_name,data):
-    if exists(os.path.join(os.getcwd(), "bots", file_name)) == False:
-        with open((os.path.join(os.getcwd(), "bots", file_name)), 'w') as file:
+    file_path = os.path.join(os.getcwd(), "bots", file_name)
+    if exists(file_path) == False:
+        with open(file_path, 'w') as file:
           json.dump(data, file)
         return 
     else:
@@ -22,6 +22,5 @@ def input_data(keys):
         final_data[key] = input(str(key)+": ")
     print("*--Pasting following--*\n", final_data)
     return final_data
-
 
 file_name = create_bot_json()
