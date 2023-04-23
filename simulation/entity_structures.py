@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 @dataclass
-
 class Vector2:
 #placeholder, will be replaced when we decide on math library
     x: int
@@ -18,4 +17,3 @@ class Entity:
     days_since_reproduction: int
     children: list #TODO: Type annotate these
     parents: list
-
