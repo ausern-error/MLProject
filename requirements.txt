@@ -1,1 +1,2 @@
-pyglet
+arcade
+arcade.gui
