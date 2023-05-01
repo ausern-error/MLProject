@@ -1,6 +1,6 @@
 # Importing libraries
-import arcade
 import json
+import arcade
 import arcade.gui
 
 # Loading JSON settings file
@@ -69,16 +69,16 @@ class MenuView(arcade.View):
 class QuitButton(arcade.gui.UIFlatButton):
     def on_click(self, event: arcade.gui.UIOnClickEvent):
         print("Line 15 - Quit class used")
-        arcade.exit() 
+        arcade.exit()
 
 
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
         arcade.set_background_color(arcade.color.JAPANESE_CARMINE)
-    
+
     def on_draw(self):
-        
+
         self.clear()
 
 
