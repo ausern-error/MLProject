@@ -12,7 +12,9 @@ class Task(Enum):
     reproduce = 3
     hunt = 4
     escape = 5
-
+@dataclass
+class EntityManager():
+    entities: list
 @dataclass
 class Entity:
     position: Vector2
@@ -26,6 +28,10 @@ class Entity:
     children: list #TODO: Type annotate these
     parents: list
     task: Task
+    entity_manager: EntityManager
+
+    def __post_init__(self):
+        self.entity_manager.entities.append(self)
     def update_task(self):
         match self.task:
             case Task.wander:
