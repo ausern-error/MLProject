@@ -26,14 +26,31 @@ class Entity:
     children: list #TODO: Type annotate these
     parents: list
     task: Task
-    def wander():
+    def update_task(self):
+        match self.task:
+            case Task.wander:
+                self.wander()
+            case Task.gather:
+                self.gather()
+            case Task.reproduce:
+                self.reproduce()
+            case Task.hunt:
+                self.hunt()
+            case Task.escape:
+                self.escape()
+    def change_task(self,new_task):
+        self.task = new_task
+    def update(self):
+        self.update_task()
+        
+    def wander(self):
         pass
-    def gather():
+    def gather(self):
         pass
-    def reproduce():
+    def reproduce(self):
         pass
-    def hunt():
+    def hunt(self):
         pass
-    def escape():
+    def escape(self):
         pass
     
