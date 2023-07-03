@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
+import resources
+#TODO: Type annotate lists
 @dataclass
 class Vector2:
 #placeholder, will be replaced when we decide on math library
@@ -17,7 +19,10 @@ class EntityManager():
     entities: list
 @dataclass
 class Entity:
-    position: Vector2
+    position: Vector2     
+    entity_manager: EntityManager
+@dataclass
+class Animal(Entity):
     animal_type: str
     age: int
     max_age: int
@@ -25,11 +30,10 @@ class Entity:
     food_consumption: int
     reproduction_rate: int
     days_since_reproduction: int
-    children: list #TODO: Type annotate these
+    children: list 
     parents: list
     task: Task
-    entity_manager: EntityManager
-
+    animalResourceRequirements : dict #TODO: type-checking, for now: this dictionary is structured as: (key:resource_name, value= AnimalResourceRequirements')
     def __post_init__(self):
         self.entity_manager.entities.append(self)
     def update_task(self):
@@ -48,7 +52,6 @@ class Entity:
         self.task = new_task
     def update(self):
         self.update_task()
-        
     def wander(self):
         pass
     def gather(self):

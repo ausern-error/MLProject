@@ -1,11 +1,14 @@
 import time
 import entity_structures
 import clock
+import resources
 last_tick_time = time.time()
 tick_speed = 60
 clock = clock.Clock(180)
+
+food = resources.Resource(None,"food")
 entity_manager = entity_structures.EntityManager(list())
-a = entity_structures.Entity(entity_structures.Vector2(0,0),"test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,entity_manager)
+a = entity_structures.Animal(entity_structures.Vector2(0,0),entity_manager,"test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
 print(a.task)
 
 while True:
