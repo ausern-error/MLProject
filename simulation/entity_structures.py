@@ -21,6 +21,7 @@ class EntityManager():
 class Entity:
     position: Vector2     
     entity_manager: EntityManager
+    texture_name: str
 @dataclass
 class Animal(Entity):
     animal_type: str
