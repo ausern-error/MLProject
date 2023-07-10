@@ -2,6 +2,10 @@
 import json
 import random
 import arcade
+from simulation import entity_structures
+from simulation import resources
+
+import os
 from arcade.gui import *
 
 
@@ -139,35 +143,6 @@ class MenuView(arcade.View):  # MENU VIEW
         print("Quit button pressed")
         arcade.close_window()  # Quits Arcade
 
-
-class Bot(arcade.Sprite):  # Basic Bot
-    def __init__(self, texture, scale, window):
-        super().__init__(texture, scale=scale)
-
-        # Velocity
-        self.change_x = 0
-        self.change_y = 0
-
-        # Reference To The Window
-        self.window = window
-
-    def update(self):
-        self.position = (
-            self.position[0] + self.change_x,
-            self.position[1] + self.change_y
-        )
-
-        # Bounce Of The Walls
-        if self.position[0] < 0:
-            self.change_x *= -1
-        elif self.position[0] > self.window.width:
-            self.change_x *= -1
-        if self.position[1] < 0:
-            self.change_y *= -1
-        elif self.position[1] > self.window.height:
-            self.change_y *= -1
-
-
 class GameView(arcade.View):  # GAME VIEW
     def __init__(self):
         super().__init__()
@@ -175,31 +150,22 @@ class GameView(arcade.View):  # GAME VIEW
         
         # Performance
         self.fps_text = None
-        
-        # Sprite
-        self.bot_list = None
-
+        self.arcade_texture_list = dict()
         self.sprite_texture_path = "./data/texture/SpriteTexture/"  # Path To Sprite Texture
-        self.sprite_texture_name = ["Bot_Sprite1.png"]  # Sprite Texture File Names
 
-    def add_bots(self, amount):
-        # Adds bots
-        for i in range(amount):
-            bot = Bot(texture=self.sprite_texture_path+self.sprite_texture_name[0], scale=1, window=self.window)  # Bot Class
-
-            bot.position = (
-                random.randrange(1, self.window.width - 1),
-                random.randrange(1, self.window.height - 1)
-            )
-            bot.change_x = random.randrange(-3, 4)
-            bot.change_y = random.randrange(-3, 4)
-
-            self.bot_list.append(bot)
+        with open(os.path.join(self.sprite_texture_path,"texture_list.json")) as texture_json:
+            texture_list = json.load(texture_json)
+        
+        for texture in texture_list:
+            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(self.sprite_texture_path,texture_list[texture]["texture_name"]))
+            self.arcade_texture_list[texture].width = texture_list[texture]["width"]
+            self.arcade_texture_list[texture].height = texture_list[texture]["height"]
+            self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
+        self.entity_manager = entity_structures.EntityManager(list())
+        a = entity_structures.Animal(entity_structures.Vector2(0,0),self.entity_manager,"animal_sheep","test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
+        b = entity_structures.Animal(entity_structures.Vector2(32,32),self.entity_manager,"animal_sheep","test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
 
     def setup(self):
-        # Sprites
-        self.bot_list = arcade.SpriteList(use_spatial_hash=False)
-        self.add_bots(911)
 
         # Performance
         self.fps_text = arcade.Text(
@@ -215,8 +181,11 @@ class GameView(arcade.View):  # GAME VIEW
         self.clear()
         arcade.start_render()
 
-        # Sprites
-        self.bot_list.draw()
+        #TODO: OPTIMISE THIS
+        for entity in self.entity_manager.entities:
+            temp_texture = self.arcade_texture_list[entity.texture_name]
+            print(temp_texture.size)
+            arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
         
         # Performance
         self.fps_text = arcade.Text(  # Updates FPS
@@ -224,11 +193,12 @@ class GameView(arcade.View):  # GAME VIEW
         start_x=10, start_y=1049,
         color=arcade.color.ALMOND)
         
-        arcade.print_timings()  # Prints Activity
         self.fps_text.draw()  # Draws FPS
 
     def on_update(self, delta_time):
-        self.bot_list.update()
+        for entity in self.entity_manager.entities:
+            entity.update()
+
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:

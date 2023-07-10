@@ -1,10 +1,10 @@
-import entity_structures
+import simulation.entity_structures
 from dataclasses import dataclass
 
 @dataclass
 class Resource:
-    Sprite: None #   uncomment after we have a way of rendering sprites
-    Name: str
+    texture_name: str
+    name: str
 
 
 @dataclass

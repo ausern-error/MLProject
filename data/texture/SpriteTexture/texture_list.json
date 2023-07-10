@@ -1,0 +1,8 @@
+{
+
+	"animal_sheep": {
+		"texture_name": "animal_sheep.png",
+		"width": 32,
+		"height": 32
+	}
+}

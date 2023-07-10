@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
-import resources
+import simulation.resources
+import random
 #TODO: Type annotate lists
 @dataclass
 class Vector2:
@@ -21,6 +22,7 @@ class EntityManager():
 class Entity:
     position: Vector2     
     entity_manager: EntityManager
+    texture_name: str
 @dataclass
 class Animal(Entity):
     animal_type: str
