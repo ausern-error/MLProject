@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
-import resources
+import simulation.resources
+import random
 #TODO: Type annotate lists
 @dataclass
 class Vector2:

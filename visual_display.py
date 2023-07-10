@@ -2,7 +2,9 @@
 import json
 import random
 import arcade
-import simulation
+from simulation import entity_structures
+from simulation import resources
+
 import os
 from arcade.gui import *
 
@@ -148,16 +150,20 @@ class GameView(arcade.View):  # GAME VIEW
         
         # Performance
         self.fps_text = None
-        self.self.arcade_texture_list = dict()
+        self.arcade_texture_list = dict()
         self.sprite_texture_path = "./data/texture/SpriteTexture/"  # Path To Sprite Texture
 
         with open(os.path.join(self.sprite_texture_path,"texture_list.json")) as texture_json:
             texture_list = json.load(texture_json)
         
         for texture in texture_list:
-            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(self.sprite_texture_path,texture_list[texture][texture_name]),0,0,texture_list[texture][width],texture_list[texture][height])
-        self.entity_manager = simulation.entity_structures.EntityManager(list())
-        a = simulation.entity_structures.Animal(entity_structures.Vector2(0,0),"animal_sheep",entity_manager,"test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
+            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(self.sprite_texture_path,texture_list[texture]["texture_name"]))
+            self.arcade_texture_list[texture].width = texture_list[texture]["width"]
+            self.arcade_texture_list[texture].height = texture_list[texture]["height"]
+            self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
+        self.entity_manager = entity_structures.EntityManager(list())
+        a = entity_structures.Animal(entity_structures.Vector2(0,0),self.entity_manager,"animal_sheep","test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
+        b = entity_structures.Animal(entity_structures.Vector2(32,32),self.entity_manager,"animal_sheep","test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
 
     def setup(self):
 
@@ -178,6 +184,7 @@ class GameView(arcade.View):  # GAME VIEW
         #TODO: OPTIMISE THIS
         for entity in self.entity_manager.entities:
             temp_texture = self.arcade_texture_list[entity.texture_name]
+            print(temp_texture.size)
             arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
         
         # Performance
@@ -186,7 +193,6 @@ class GameView(arcade.View):  # GAME VIEW
         start_x=10, start_y=1049,
         color=arcade.color.ALMOND)
         
-        arcade.print_timings()  # Prints Activity
         self.fps_text.draw()  # Draws FPS
 
     def on_update(self, delta_time):

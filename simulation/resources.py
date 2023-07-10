@@ -1,4 +1,4 @@
-import entity_structures
+import simulation.entity_structures
 from dataclasses import dataclass
 
 @dataclass
