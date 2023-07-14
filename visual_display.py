@@ -239,8 +239,8 @@ class SettingsView(arcade.View):  # SETTINGS VIEW
 
 def main():  # MAIN FUNCTION
     window = arcade.Window(  # Creates window
-        width=WINDOW_HEIGHT,
-        height=WINDOW_WIDTH,
+        width=WINDOW_WIDTH,
+        height=WINDOW_HEIGHT,
         title=WINDOW_TITLE,
         antialiasing=True,
         enable_polling=True,
