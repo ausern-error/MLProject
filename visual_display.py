@@ -23,16 +23,16 @@ SPRITE_SCALE = int(1)
 
 arcade.enable_timings()  # Enables Timing For FPS & STATS
 
+
 class MenuView(arcade.View):  # MENU VIEW
     def __init__(self):
         super().__init__()
 
         self.font_path = "./data/fonts/"  # Texture Path
         self.texture_path = "./data/texture/MenuBackgrounds/"  # texture path
-        
-        backgrounds = ["MenuBackground (1).jpg", "MenuBackground (2).jpg",
-                    "MenuBackground (3).jpg", "MenuBackground (4).jpg"]  # Texture File Names
-        self.fonts = ["TheLastCall-Regular", "CorelDraw", "space age"]  # Font File Names
+
+        backgrounds = ["MenuBackground (1).png"]  # Texture File Names 
+        self.fonts = ["Ticketing", "novem___", "arcadeclassic", "lunchds"]  # Font File Names
 
         # Loads Fonts
         for font in self.fonts:
@@ -41,43 +41,44 @@ class MenuView(arcade.View):  # MENU VIEW
 
         # Loads Background Texture
         background = random.choice(backgrounds)
-        self.background_texture = arcade.load_texture(self.texture_path + background)
+        self.background_texture = arcade.load_texture(
+            self.texture_path + background)
 
         # Creating text object for heading & author
         self.heading_text = arcade.Text(
-            "Simulation of Species", self.window.width-1890, self.window.height-75,
+            "Evolving  Simulations  of  Animal  Behavior", self.window.width-1890, self.window.height-75,
             arcade.color.WHITE, font_size=50,
             anchor_x="left",
             anchor_y="bottom",
-            font_name="space age")
+            font_name="Ticketing")
         self.author_text = arcade.Text(
-            "By tabish & aslan", self.window.width-200, self.window.height-1030,
-            arcade.color.WHITE, font_size=14,
+            "By Tabish & Aslan", self.window.width-250, self.window.height-1030,
+            arcade.color.WHITE, font_size=18,
             anchor_x="left",
             anchor_y="top",
-            font_name="The Last Call")
+            font_name="November")
 
         # Button Style
         button_style = {
             "normal": UIFlatButton.UIStyle(
-                font_size=15,
-                font_name="CorelDraw",
+                font_size=16,
+                font_name="lunchtime doubly so",
                 font_color=arcade.color.NAVAJO_WHITE,
                 bg=arcade.color.TRANSPARENT_BLACK,
                 border=None,
                 border_width=2
             ),
             "hover": UIFlatButton.UIStyle(
-                font_size=15,
-                font_name="CorelDraw",
+                font_size=18,
+                font_name="lunchtime doubly so",
                 font_color=arcade.color.BLACK,
                 bg=arcade.color.ANTIQUE_WHITE,
                 border=arcade.color.EERIE_BLACK,
                 border_width=3
             ),
             "press": UIFlatButton.UIStyle(
-                font_size=15,
-                font_name="CorelDraw",
+                font_size=18,
+                font_name="lunchtime doubly so",
                 font_color=arcade.color.WARM_BLACK,
                 bg=arcade.color.LIGHT_GRAY,
                 border=arcade.color.DAVY_GREY,
@@ -90,7 +91,8 @@ class MenuView(arcade.View):  # MENU VIEW
         self.ui_manager.enable()
 
         # Creates Vertical Box
-        self.v_box = arcade.gui.widgets.layout.UIBoxLayout(space_between=15, align="right")  # Vertical Box
+        self.v_box = arcade.gui.widgets.layout.UIBoxLayout(
+            space_between=15, align="right")  # Vertical Box
 
         # Creates Buttons
         simulation_button = arcade.gui.widgets.buttons.UIFlatButton(
@@ -106,7 +108,8 @@ class MenuView(arcade.View):  # MENU VIEW
         self.v_box.add(exit_button)
 
         # Creates Widget
-        ui_anchor_layout = arcade.gui.widgets.layout.UIAnchorLayout(x=30, y=-110)
+        ui_anchor_layout = arcade.gui.widgets.layout.UIAnchorLayout(
+            x=30, y=-110)
         ui_anchor_layout.add(child=self.v_box, anchor_x="left", anchor_y="top")
         self.ui_manager.add(ui_anchor_layout)
 
@@ -118,7 +121,7 @@ class MenuView(arcade.View):  # MENU VIEW
     def on_draw(self):
         arcade.start_render()
         arcade.draw_texture_rectangle(
-            self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.background_texture) #  Draws Wallpaper
+            self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.background_texture)  # Draws Wallpaper
         self.heading_text.draw()  # Draws Heading Text
         self.author_text.draw()  # Draws Author Text
         self.ui_manager.draw()  # Draws Buttons
@@ -130,7 +133,6 @@ class MenuView(arcade.View):  # MENU VIEW
         game_view = GameView()
         self.window.show_view(game_view)  # Changes View
 
-
     def on_click_settings(self, event):
         print("View Change To SettingsView")
         self.ui_manager.disable()  # Unloads buttons
@@ -138,36 +140,41 @@ class MenuView(arcade.View):  # MENU VIEW
         settings_view.on_draw()
         self.window.show_view(settings_view)  # Changes View
 
-
     def on_click_quit(self, event):
         print("Quit button pressed")
         arcade.close_window()  # Quits Arcade
+
 
 class GameView(arcade.View):  # GAME VIEW
     def __init__(self):
         super().__init__()
         arcade.set_background_color(arcade.color.BATTLESHIP_GREY)
-        
-        # Performance
+
         self.fps_text = None
         self.arcade_texture_list = dict()
         self.sprite_texture_path = "./data/texture/SpriteTexture/"  # Path To Sprite Texture
 
-        with open(os.path.join(self.sprite_texture_path,"texture_list.json")) as texture_json:
+        with open(os.path.join(self.sprite_texture_path, "texture_list.json")) as texture_json:
             texture_list = json.load(texture_json)
-        
+
         for texture in texture_list:
-            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(self.sprite_texture_path,texture_list[texture]["texture_name"]))
+            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(
+                self.sprite_texture_path, texture_list[texture]["texture_name"]))
             self.arcade_texture_list[texture].width = texture_list[texture]["width"]
             self.arcade_texture_list[texture].height = texture_list[texture]["height"]
-            self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
+            self.arcade_texture_list[texture].size = (
+                texture_list[texture]["width"], texture_list[texture]["height"])
         self.entity_manager = entity_structures.EntityManager(list())
-        a = entity_structures.Animal(entity_structures.Vector2(0,0),self.entity_manager,"animal_sheep","test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
-        b = entity_structures.Animal(entity_structures.Vector2(32,32),self.entity_manager,"animal_sheep","test",3,15,10,1,2,3,list(),list(),entity_structures.Task.wander,{"food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,10))} )
+        a = entity_structures.Animal(entity_structures.Vector2(self.window.width/2, self.window.height/2),
+                                    entity_manager=self.entity_manager, texture_name="animal_sheep", animal_type="test",
+                                    age=3, max_age=15, food=10, food_consumption=1, reproduction_rate=2, days_since_reproduction=3,
+                                    children=list(), parents=list(), task=entity_structures.Task.wander, 
+                                    animalResourceRequirements={"food": resources.AnimalResourceRequirements(True, True, 3, (0, 10), (0, 10))})
+
+        b = entity_structures.Animal(entity_structures.Vector2(32, 32), self.entity_manager, "animal_sheep", "test", 3, 15, 10, 1, 2, 3, list(
+        ), list(), entity_structures.Task.wander, {"food": resources.AnimalResourceRequirements(True, True, 3, (0, 10), (0, 10))})
 
     def setup(self):
-
-        # Performance
         self.fps_text = arcade.Text(
             text=f"FPS:{round(arcade.get_fps())}",
             start_x=10, start_y=1049,
@@ -181,24 +188,24 @@ class GameView(arcade.View):  # GAME VIEW
         self.clear()
         arcade.start_render()
 
-        #TODO: OPTIMISE THIS
+        # TODO: OPTIMISE THIS
         for entity in self.entity_manager.entities:
             temp_texture = self.arcade_texture_list[entity.texture_name]
             print(temp_texture.size)
-            arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
-        
+            arcade.draw_texture_rectangle(
+                entity.position.x, entity.position.y, temp_texture.width, temp_texture.height, temp_texture)
+
         # Performance
         self.fps_text = arcade.Text(  # Updates FPS
-        text=f"FPS:{round(arcade.get_fps())}",
-        start_x=10, start_y=1049,
-        color=arcade.color.ALMOND)
-        
+            text=f"FPS:{round(arcade.get_fps())}",
+            start_x=10, start_y=1049,
+            color=arcade.color.ALMOND)
+
         self.fps_text.draw()  # Draws FPS
 
     def on_update(self, delta_time):
         for entity in self.entity_manager.entities:
             entity.update()
-
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
@@ -232,14 +239,14 @@ class SettingsView(arcade.View):  # SETTINGS VIEW
 
 def main():  # MAIN FUNCTION
     window = arcade.Window(  # Creates window
-        width=WINDOW_HEIGHT,
-        height=WINDOW_WIDTH,
+        width=WINDOW_WIDTH,
+        height=WINDOW_HEIGHT,
         title=WINDOW_TITLE,
         antialiasing=True,
         enable_polling=True,
         fullscreen=True
-        )
-    
+    )
+
     menu_view = MenuView()
     window.show_view(menu_view)  # Changes View To Menu
     arcade.run()
