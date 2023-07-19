@@ -2,6 +2,7 @@
 import json
 import random
 import arcade
+import time
 from simulation import entity_structures
 from simulation import resources
 
@@ -23,6 +24,30 @@ SPRITE_SCALE = int(1)
 
 arcade.enable_timings()  # Enables Timing For FPS & STATS
 
+class Cloud(arcade.Sprite):
+    def __init__(self, texture, scale):
+        super().__init__(texture, scale=scale)
+
+        # Velocity
+        self.change_x = random.uniform(0.4, 1.5)
+        self.change_y = 0
+
+        self.position = (
+            random.randrange(0, 2000),
+            random.randrange(700, 1065)
+        )
+
+    def update(self):
+        self.position = (
+            self.position[0] + self.change_x,
+            self.position[1] + self.change_y
+
+        )
+
+        if self.position[0] > 2000:
+            self.center_x = 0
+            self.center_y = random.randrange(700, 1065)
+
 
 class MenuView(arcade.View):  # MENU VIEW
     def __init__(self):
@@ -31,7 +56,7 @@ class MenuView(arcade.View):  # MENU VIEW
         self.font_path = "./data/fonts/"  # Texture Path
         self.texture_path = "./data/texture/MenuBackgrounds/"  # texture path
 
-        backgrounds = ["MenuBackground (1).png"]  # Texture File Names 
+        backgrounds = ["menu_background (1).png"]  # Texture File Names 
         self.fonts = ["Ticketing", "novem___", "arcadeclassic", "lunchds"]  # Font File Names
 
         # Loads Fonts
@@ -46,7 +71,7 @@ class MenuView(arcade.View):  # MENU VIEW
 
         # Creating text object for heading & author
         self.heading_text = arcade.Text(
-            "Evolving  Simulations  of  Animal  Behavior", self.window.width-1890, self.window.height-75,
+            "Evolving  Simulations  of  Animal  Behavior", self.window.width-1615, self.window.height/2+320,
             arcade.color.WHITE, font_size=50,
             anchor_x="left",
             anchor_y="bottom",
@@ -92,7 +117,7 @@ class MenuView(arcade.View):  # MENU VIEW
 
         # Creates Vertical Box
         self.v_box = arcade.gui.widgets.layout.UIBoxLayout(
-            space_between=15, align="right")  # Vertical Box
+            space_between=15, align="center")  # Vertical Box
 
         # Creates Buttons
         simulation_button = arcade.gui.widgets.buttons.UIFlatButton(
@@ -110,7 +135,7 @@ class MenuView(arcade.View):  # MENU VIEW
         # Creates Widget
         ui_anchor_layout = arcade.gui.widgets.layout.UIAnchorLayout(
             x=30, y=-110)
-        ui_anchor_layout.add(child=self.v_box, anchor_x="left", anchor_y="top")
+        ui_anchor_layout.add(child=self.v_box)
         self.ui_manager.add(ui_anchor_layout)
 
         # Button Click Events
@@ -118,13 +143,34 @@ class MenuView(arcade.View):  # MENU VIEW
         settings_button.on_click = self.on_click_settings
         exit_button.on_click = self.on_click_quit
 
+        #cute cloudies
+        self.cloud_list = None
+        self.cloud_textures = [self.texture_path+"cloud_texture (1).png", self.texture_path+"cloud_texture (2).png", self.texture_path+"cloud_texture (3).png"]
+        self.arr_len = len(self.cloud_textures)
+    
+    def add_clouds(self, amount):  # TODO: Reference Window for Spawning of Clouds
+        for i in range(amount):
+            cloud = Cloud(self.cloud_textures[(random.randrange(0, self.arr_len))], random.uniform(0.8, 2))
+            self.cloud_list.append(cloud)
+
+    def setup(self):
+        self.cloud_list = arcade.SpriteList(use_spatial_hash=False)
+        self.add_clouds(9)
+
+        arcade.schedule(self.update, 1/60)
+    
+    def update(self, delta_time):
+        self.cloud_list.update()
+
     def on_draw(self):
         arcade.start_render()
         arcade.draw_texture_rectangle(
             self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.background_texture)  # Draws Wallpaper
+        self.cloud_list.draw()
         self.heading_text.draw()  # Draws Heading Text
         self.author_text.draw()  # Draws Author Text
         self.ui_manager.draw()  # Draws Buttons
+        
 
     # Button Functions
     def on_click_StartSimulation(self, event):
@@ -214,7 +260,7 @@ class GameView(arcade.View):  # GAME VIEW
     def MenuView_Change(self):
         print("View Change To MenuView")
         menu_view = MenuView()
-        menu_view.on_draw()
+        menu_view.setup()
         self.window.show_view(menu_view)
 
 
@@ -230,7 +276,7 @@ class SettingsView(arcade.View):  # SETTINGS VIEW
     def MenuView_Change(self):
         print("View Change To MenuView")
         menu_view = MenuView()
-        menu_view.on_draw()
+        menu_view.setup()
         self.window.show_view(menu_view)
 
     def on_draw(self):
@@ -248,6 +294,7 @@ def main():  # MAIN FUNCTION
     )
 
     menu_view = MenuView()
+    menu_view.setup()
     window.show_view(menu_view)  # Changes View To Menu
     arcade.run()
 
