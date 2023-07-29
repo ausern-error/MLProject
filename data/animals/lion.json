@@ -1,0 +1,17 @@
+{
+	"type": "lion",
+	"texture": "lion.png",
+	"resource_requirements": {
+		"carnivore_food": {
+			"neededForSurvival": true,
+			"neededForReproduction": true,
+			"priority": 0,
+			"dailyUsageRate": [0, 10],
+			"reproductionUsageRate": [0, 10]
+		}
+	},
+	"prey:"{
+		"sheep": 3
+	}
+	"base_speed": 30
+}

@@ -1,12 +1,25 @@
-import simulation.entity_structures
+from simulation import entity_structures
 from dataclasses import dataclass
-
+import os
+import json
 @dataclass
-class Resource:
-    texture_name: str
+class Resource(entity_structures.Entity):
     name: str
-
-
+    quantity: int
+    def __post_init__(self):
+        super().__post_init__()
+        self.entity_type = entity_structures.EntityType.resource
+@dataclass
+class ResourceManager():
+    path_to_data: str
+    def __post_init__(self):
+        self.resources = list()
+        self.TEXTURE = "texture"
+        self.SPAWNCHANCE = "spawn_chance"
+        self.SPAWNAMOUNT = "spawn_amount" 
+        self.QUANTITY = "quantity" #how much each resource gives on collection
+        with open(os.path.join(self.path_to_data,"resources.json")) as resource_json:
+            self.resources = json.load(resource_json)
 @dataclass
 class AnimalResourceRequirements:
     neededForSurvival: bool
