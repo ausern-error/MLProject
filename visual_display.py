@@ -22,7 +22,16 @@ WINDOW_TITLE = str(settings_json["window_title"])
 # Sprite Settings
 SPRITE_SCALE = int(1)
 
+#Font names
+fonts = ["Ticketing", "novem___", "arcadeclassic", "lunchds"]
+
 arcade.enable_timings()  # Enables Timing For FPS & STATS
+
+def font_loader(fonts):
+    font_path = "./data/fonts/"
+    for font in fonts:
+        arcade.load_font(font_path + font + ".ttf")
+        print("Succesfully Loaded Font: : " + font + ".ttf")
 
 class Cloud(arcade.Sprite):
     def __init__(self, texture, scale):
@@ -53,16 +62,10 @@ class MenuView(arcade.View):  # MENU VIEW
     def __init__(self):
         super().__init__()
 
-        self.font_path = "./data/fonts/"  # Texture Path
+
         self.texture_path = "./data/texture/MenuBackgrounds/"  # texture path
 
         backgrounds = ["menu_background (1).png"]  # Texture File Names 
-        self.fonts = ["Ticketing", "novem___", "arcadeclassic", "lunchds"]  # Font File Names
-
-        # Loads Fonts
-        for font in self.fonts:
-            arcade.load_font(self.font_path + font + ".ttf")
-            print("Succesfully Loaded Font: : " + font + ".ttf")
 
         # Loads Background Texture
         background = random.choice(backgrounds)
@@ -292,7 +295,7 @@ def main():  # MAIN FUNCTION
         enable_polling=True,
         fullscreen=True
     )
-
+    font_loader(fonts)
     menu_view = MenuView()
     menu_view.setup()
     window.show_view(menu_view)  # Changes View To Menu
