@@ -1,7 +1,16 @@
 {
-
 	"animal_sheep": {
 		"texture_name": "animal_sheep.png",
+		"width": 32,
+		"height": 32
+	},
+	"resource_herbivore_food":  {
+		"texture_name": "resource_herbivore_food.png",
+		"width": 32,
+		"height": 32
+	},
+	"resource_water":  {
+		"texture_name": "resource_water.png",
 		"width": 32,
 		"height": 32
 	}

@@ -2,6 +2,9 @@
 import json
 import random
 import arcade
+import random
+from simulation import entity_structures,resources,clock,event_manager
+
 import time
 from simulation import entity_structures
 from simulation import resources
@@ -9,15 +12,23 @@ from simulation import resources
 import os
 from arcade.gui import *
 
+#set up randomness
+random.seed()
 
 # Loading JSON settings file
-with open("./input/settings.json") as settings_json:
+with open("./data/settings.json") as settings_json:
     settings_json = json.load(settings_json)
 
 # Importing Settings From JSON
 WINDOW_WIDTH = int(settings_json["window_width"])
 WINDOW_HEIGHT = int(settings_json["window_height"])
 WINDOW_TITLE = str(settings_json["window_title"])
+
+MAP_WIDTH = int(settings_json["map_width"])
+MAP_HEIGHT = int(settings_json["map_height"])
+
+
+
 
 # Sprite Settings
 SPRITE_SCALE = int(1)
@@ -61,7 +72,6 @@ class Cloud(arcade.Sprite):
 class MenuView(arcade.View):  # MENU VIEW
     def __init__(self):
         super().__init__()
-
 
         self.texture_path = "./data/texture/MenuBackgrounds/"  # texture path
 
@@ -165,6 +175,7 @@ class MenuView(arcade.View):  # MENU VIEW
     def update(self, delta_time):
         self.cloud_list.update()
 
+
     def on_draw(self):
         arcade.start_render()
         arcade.draw_texture_rectangle(
@@ -173,14 +184,16 @@ class MenuView(arcade.View):  # MENU VIEW
         self.heading_text.draw()  # Draws Heading Text
         self.author_text.draw()  # Draws Author Text
         self.ui_manager.draw()  # Draws Buttons
+
         
+
 
     # Button Functions
     def on_click_StartSimulation(self, event):
-        print("View Change To GameView")
+        print("View Change To SimulationView")
         self.ui_manager.disable()  # Unloads buttons
-        game_view = GameView()
-        self.window.show_view(game_view)  # Changes View
+        simulation_view = SimulationView()        
+        self.window.show_view(simulation_view)  # Changes View
 
     def on_click_settings(self, event):
         print("View Change To SettingsView")
@@ -194,13 +207,19 @@ class MenuView(arcade.View):  # MENU VIEW
         arcade.close_window()  # Quits Arcade
 
 
-class GameView(arcade.View):  # GAME VIEW
+
+class SimulationView(arcade.View):      
     def __init__(self):
+
+
+
         super().__init__()
         arcade.set_background_color(arcade.color.BATTLESHIP_GREY)
-
+        #camera
+        self.camera = arcade.Camera(viewport=(0,0,WINDOW_WIDTH,WINDOW_HEIGHT))
         self.fps_text = None
         self.arcade_texture_list = dict()
+        self.path_to_data = os.path.join(".","data")
         self.sprite_texture_path = "./data/texture/SpriteTexture/"  # Path To Sprite Texture
 
         with open(os.path.join(self.sprite_texture_path, "texture_list.json")) as texture_json:
@@ -209,20 +228,21 @@ class GameView(arcade.View):  # GAME VIEW
         for texture in texture_list:
             self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(
                 self.sprite_texture_path, texture_list[texture]["texture_name"]))
-            self.arcade_texture_list[texture].width = texture_list[texture]["width"]
-            self.arcade_texture_list[texture].height = texture_list[texture]["height"]
-            self.arcade_texture_list[texture].size = (
-                texture_list[texture]["width"], texture_list[texture]["height"])
-        self.entity_manager = entity_structures.EntityManager(list())
-        a = entity_structures.Animal(entity_structures.Vector2(self.window.width/2, self.window.height/2),
-                                    entity_manager=self.entity_manager, texture_name="animal_sheep", animal_type="test",
-                                    age=3, max_age=15, food=10, food_consumption=1, reproduction_rate=2, days_since_reproduction=3,
-                                    children=list(), parents=list(), task=entity_structures.Task.wander, 
-                                    animalResourceRequirements={"food": resources.AnimalResourceRequirements(True, True, 3, (0, 10), (0, 10))})
+            #self.arcade_texture_list[texture].width = texture_list[texture]["width"]
+            #self.arcade_texture_list[texture].height = texture_list[texture]["height"]
 
-        b = entity_structures.Animal(entity_structures.Vector2(32, 32), self.entity_manager, "animal_sheep", "test", 3, 15, 10, 1, 2, 3, list(
-        ), list(), entity_structures.Task.wander, {"food": resources.AnimalResourceRequirements(True, True, 3, (0, 10), (0, 10))})
+            self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
+        self.clock = clock.Clock(5)
 
+        self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock)
+        
+        a = entity_structures.Animal(entity_structures.Vector2(256,32),self.entity_manager,"animal_sheep","animal_sheep",0,32,3,list(),list(),entity_structures.Task.wander,{"herbivore_food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,0)),"water":resources.AnimalResourceRequirements(True,True,1,(0,10),(0,0))},32,None,"carnivore_food",3)
+        self.b = entity_structures.Animal(entity_structures.Vector2(32,32),self.entity_manager,"animal_sheep","animal_sheep",0,32,3,list(),list(),entity_structures.Task.wander,{"herbivore_food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,0)),"water":resources.AnimalResourceRequirements(True,True,1,(0,10),(0,0))},128,None,"carnivore_food",3)
+        self.b.days_before_reproduction = 0
+        self.resource_manager = resources.ResourceManager(self.path_to_data)
+
+        #event manager
+        self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT);
     def setup(self):
         self.fps_text = arcade.Text(
             text=f"FPS:{round(arcade.get_fps())}",
@@ -236,14 +256,14 @@ class GameView(arcade.View):  # GAME VIEW
     def on_draw(self):
         self.clear()
         arcade.start_render()
-
-        # TODO: OPTIMISE THIS
+        self.camera.use()
+        #TODO: OPTIMISE THIS
         for entity in self.entity_manager.entities:
-            temp_texture = self.arcade_texture_list[entity.texture_name]
-            print(temp_texture.size)
-            arcade.draw_texture_rectangle(
-                entity.position.x, entity.position.y, temp_texture.width, temp_texture.height, temp_texture)
-
+            if entity.texture_name in self.arcade_texture_list:
+                temp_texture = self.arcade_texture_list[entity.texture_name]
+                temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
+                #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
+        
         # Performance
         self.fps_text = arcade.Text(  # Updates FPS
             text=f"FPS:{round(arcade.get_fps())}",
@@ -254,7 +274,9 @@ class GameView(arcade.View):  # GAME VIEW
 
     def on_update(self, delta_time):
         for entity in self.entity_manager.entities:
-            entity.update()
+            entity.update(delta_time)
+        self.clock.tick(delta_time)            
+        self.event_manager.update(delta_time)
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
@@ -293,7 +315,10 @@ def main():  # MAIN FUNCTION
         title=WINDOW_TITLE,
         antialiasing=True,
         enable_polling=True,
-        fullscreen=True
+        fullscreen=False
+        #TODO: test on different refresh rates
+        )
+    
     )
     font_loader(fonts)
     menu_view = MenuView()
