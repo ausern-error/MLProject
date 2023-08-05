@@ -5,6 +5,10 @@ import arcade
 import random
 from simulation import entity_structures,resources,clock,event_manager
 
+import time
+from simulation import entity_structures
+from simulation import resources
+
 import os
 from arcade.gui import *
 
@@ -29,63 +33,90 @@ MAP_HEIGHT = int(settings_json["map_height"])
 # Sprite Settings
 SPRITE_SCALE = int(1)
 
+#Font names
+fonts = ["Ticketing", "novem___", "arcadeclassic", "lunchds"]
+
 arcade.enable_timings()  # Enables Timing For FPS & STATS
+
+def font_loader(fonts):
+    font_path = "./data/fonts/"
+    for font in fonts:
+        arcade.load_font(font_path + font + ".ttf")
+        print("Succesfully Loaded Font: : " + font + ".ttf")
+
+class Cloud(arcade.Sprite):
+    def __init__(self, texture, scale):
+        super().__init__(texture, scale=scale)
+
+        # Velocity
+        self.change_x = random.uniform(0.4, 1.5)
+        self.change_y = 0
+
+        self.position = (
+            random.randrange(0, 2000),
+            random.randrange(700, 1065)
+        )
+
+    def update(self):
+        self.position = (
+            self.position[0] + self.change_x,
+            self.position[1] + self.change_y
+
+        )
+
+        if self.position[0] > 2000:
+            self.center_x = 0
+            self.center_y = random.randrange(700, 1065)
+
 
 class MenuView(arcade.View):  # MENU VIEW
     def __init__(self):
         super().__init__()
 
-        self.font_path = "./data/fonts/"  # Texture Path
         self.texture_path = "./data/texture/MenuBackgrounds/"  # texture path
-        
-        backgrounds = ["MenuBackground (1).jpg", "MenuBackground (2).jpg",
-                    "MenuBackground (3).jpg", "MenuBackground (4).jpg"]  # Texture File Names
-        self.fonts = ["TheLastCall-Regular", "CorelDraw", "space age"]  # Font File Names
-        
-        # Loads Fonts
-        for font in self.fonts:
-            arcade.load_font(self.font_path + font + ".ttf")
-            print("Succesfully Loaded Font: : " + font + ".ttf")
-        
+
+        backgrounds = ["menu_background (1).png"]  # Texture File Names 
+
         # Loads Background Texture
         background = random.choice(backgrounds)
-        self.background_texture = arcade.load_texture(self.texture_path + background)
+        self.background_texture = arcade.load_texture(
+            self.texture_path + background)
 
         # Creating text object for heading & author
         self.heading_text = arcade.Text(
-            "Simulation of Species", self.window.width-1890, self.window.height-75,
+            "Evolving  Simulations  of  Animal  Behavior", self.window.width-1615, self.window.height/2+320,
             arcade.color.WHITE, font_size=50,
             anchor_x="left",
             anchor_y="bottom",
-            font_name="space age")
+            font_name="Ticketing")
         self.author_text = arcade.Text(
-            "By tabish & aslan", self.window.width-200, self.window.height-1030,
-            arcade.color.WHITE, font_size=14,
+            "By Tabish & Aslan", self.window.width-250, self.window.height-1030,
+            arcade.color.WHITE, font_size=18,
             anchor_x="left",
             anchor_y="top",
-            font_name="The Last Call")
+            font_name="November")
 
         # Button Style
         button_style = {
             "normal": UIFlatButton.UIStyle(
-                font_size=15,
-                font_name="CorelDraw",
+                font_size=16,
+                font_name="lunchtime doubly so",
                 font_color=arcade.color.NAVAJO_WHITE,
                 bg=arcade.color.TRANSPARENT_BLACK,
                 border=None,
                 border_width=2
             ),
             "hover": UIFlatButton.UIStyle(
-                font_size=15,
-                font_name="CorelDraw",
+                font_size=18,
+                font_name="lunchtime doubly so",
                 font_color=arcade.color.BLACK,
                 bg=arcade.color.ANTIQUE_WHITE,
                 border=arcade.color.EERIE_BLACK,
                 border_width=3
             ),
             "press": UIFlatButton.UIStyle(
-                font_size=15,
-                font_name="CorelDraw",
+                font_size=18,
+                font_name="lunchtime doubly so",
                 font_color=arcade.color.WARM_BLACK,
                 bg=arcade.color.LIGHT_GRAY,
                 border=arcade.color.DAVY_GREY,
@@ -98,7 +129,8 @@ class MenuView(arcade.View):  # MENU VIEW
         self.ui_manager.enable()
 
         # Creates Vertical Box
-        self.v_box = arcade.gui.widgets.layout.UIBoxLayout(space_between=15, align="right")  # Vertical Box
+        self.v_box = arcade.gui.widgets.layout.UIBoxLayout(
+            space_between=15, align="center")  # Vertical Box
 
         # Creates Buttons
         simulation_button = arcade.gui.widgets.buttons.UIFlatButton(
@@ -114,8 +146,9 @@ class MenuView(arcade.View):  # MENU VIEW
         self.v_box.add(exit_button)
 
         # Creates Widget
-        ui_anchor_layout = arcade.gui.widgets.layout.UIAnchorLayout(x=30, y=-110)
-        ui_anchor_layout.add(child=self.v_box, anchor_x="left", anchor_y="top")
+        ui_anchor_layout = arcade.gui.widgets.layout.UIAnchorLayout(
+            x=30, y=-110)
+        ui_anchor_layout.add(child=self.v_box)
         self.ui_manager.add(ui_anchor_layout)
 
         # Button Click Events
@@ -123,19 +156,37 @@ class MenuView(arcade.View):  # MENU VIEW
         settings_button.on_click = self.on_click_settings
         exit_button.on_click = self.on_click_quit
 
+        #cute cloudies
+        self.cloud_list = None
+        self.cloud_textures = [self.texture_path+"cloud_texture (1).png", self.texture_path+"cloud_texture (2).png", self.texture_path+"cloud_texture (3).png"]
+        self.arr_len = len(self.cloud_textures)
+    
+    def add_clouds(self, amount):  # TODO: Reference Window for Spawning of Clouds
+        for i in range(amount):
+            cloud = Cloud(self.cloud_textures[(random.randrange(0, self.arr_len))], random.uniform(0.8, 2))
+            self.cloud_list.append(cloud)
+
+    def setup(self):
+        self.cloud_list = arcade.SpriteList(use_spatial_hash=False)
+        self.add_clouds(9)
+
+        arcade.schedule(self.update, 1/60)
+    
+    def update(self, delta_time):
+        self.cloud_list.update()
+
 
     def on_draw(self):
         arcade.start_render()
         arcade.draw_texture_rectangle(
-            self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.background_texture) #  Draws Wallpaper
+            self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.background_texture)  # Draws Wallpaper
+        self.cloud_list.draw()
         self.heading_text.draw()  # Draws Heading Text
         self.author_text.draw()  # Draws Author Text
         self.ui_manager.draw()  # Draws Buttons
-        print("View Change To GameView")
-        self.ui_manager.disable()  # Unloads buttons
-        #debug skips main menyu
-        simulation_view = SimulationView()        
-        self.window.show_view(simulation_view)  # Changes View
+
+        
+
 
     # Button Functions
     def on_click_StartSimulation(self, event):
@@ -144,7 +195,6 @@ class MenuView(arcade.View):  # MENU VIEW
         simulation_view = SimulationView()        
         self.window.show_view(simulation_view)  # Changes View
 
-
     def on_click_settings(self, event):
         print("View Change To SettingsView")
         self.ui_manager.disable()  # Unloads buttons
@@ -152,32 +202,35 @@ class MenuView(arcade.View):  # MENU VIEW
         settings_view.on_draw()
         self.window.show_view(settings_view)  # Changes View
 
-
     def on_click_quit(self, event):
         print("Quit button pressed")
         arcade.close_window()  # Quits Arcade
 
 
+
 class SimulationView(arcade.View):      
     def __init__(self):
+
+
+
         super().__init__()
         arcade.set_background_color(arcade.color.BATTLESHIP_GREY)
-        
         #camera
         self.camera = arcade.Camera(viewport=(0,0,WINDOW_WIDTH,WINDOW_HEIGHT))
-        # Performance
         self.fps_text = None
         self.arcade_texture_list = dict()
         self.path_to_data = os.path.join(".","data")
         self.sprite_texture_path = "./data/texture/SpriteTexture/"  # Path To Sprite Texture
 
-        with open(os.path.join(self.sprite_texture_path,"texture_list.json")) as texture_json:
+        with open(os.path.join(self.sprite_texture_path, "texture_list.json")) as texture_json:
             texture_list = json.load(texture_json)
-        
+
         for texture in texture_list:
-            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(self.sprite_texture_path,texture_list[texture]["texture_name"]))
-            self.arcade_texture_list[texture].width = texture_list[texture]["width"]
-            self.arcade_texture_list[texture].height = texture_list[texture]["height"]
+            self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(
+                self.sprite_texture_path, texture_list[texture]["texture_name"]))
+            #self.arcade_texture_list[texture].width = texture_list[texture]["width"]
+            #self.arcade_texture_list[texture].height = texture_list[texture]["height"]
+
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
         self.clock = clock.Clock(5)
 
@@ -191,8 +244,6 @@ class SimulationView(arcade.View):
         #event manager
         self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT);
     def setup(self):
-
-        # Performance
         self.fps_text = arcade.Text(
             text=f"FPS:{round(arcade.get_fps())}",
             start_x=10, start_y=1049,
@@ -215,10 +266,10 @@ class SimulationView(arcade.View):
         
         # Performance
         self.fps_text = arcade.Text(  # Updates FPS
-        text=f"FPS:{round(arcade.get_fps())}",
-        start_x=10, start_y=1049,
-        color=arcade.color.ALMOND)
-        
+            text=f"FPS:{round(arcade.get_fps())}",
+            start_x=10, start_y=1049,
+            color=arcade.color.ALMOND)
+
         self.fps_text.draw()  # Draws FPS
 
     def on_update(self, delta_time):
@@ -234,7 +285,7 @@ class SimulationView(arcade.View):
     def MenuView_Change(self):
         print("View Change To MenuView")
         menu_view = MenuView()
-        menu_view.on_draw()
+        menu_view.setup()
         self.window.show_view(menu_view)
 
 
@@ -250,7 +301,7 @@ class SettingsView(arcade.View):  # SETTINGS VIEW
     def MenuView_Change(self):
         print("View Change To MenuView")
         menu_view = MenuView()
-        menu_view.on_draw()
+        menu_view.setup()
         self.window.show_view(menu_view)
 
     def on_draw(self):
@@ -268,7 +319,10 @@ def main():  # MAIN FUNCTION
         #TODO: test on different refresh rates
         )
     
+    )
+    font_loader(fonts)
     menu_view = MenuView()
+    menu_view.setup()
     window.show_view(menu_view)  # Changes View To Menu
     arcade.run()
 
