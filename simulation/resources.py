@@ -27,3 +27,6 @@ class AnimalResourceRequirements:
     priority: int #animals who have multiple requirements will go to the closest resource with the highest priority
     dailyUsageRate: list # rate is randomly chosen from list, TODO: Investigate weighting this
     reproductionUsageRate: list
+    def Decode(string):
+        return None
+        #implement

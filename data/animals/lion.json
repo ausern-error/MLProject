@@ -1,6 +1,8 @@
 {
 	"type": "lion",
 	"texture": "lion.png",
+    "max_age": 10,
+    "max_days_before_reproduction": 3,
 	"resource_requirements": {
 		"carnivore_food": {
 			"neededForSurvival": true,
@@ -10,8 +12,11 @@
 			"reproductionUsageRate": [0, 10]
 		}
 	},
+	"base_speed": 30,
 	"prey:"{
 		"sheep": 3
 	}
-	"base_speed": 30
+    "resource_on_death": "lion_meat"
+    "resource_count_on_death": 3
+    "starting_number": 10
 }

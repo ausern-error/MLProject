@@ -1,4 +1,4 @@
-import random
+++import random
 from simulation import entity_structures, resources, clock
 from dataclasses import dataclass
 @dataclass
