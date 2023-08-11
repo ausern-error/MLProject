@@ -1,5 +1,5 @@
 import random
-from simulation import entity_structures, resources, clock
+from simulation import entity_structures, resources,clock
 from dataclasses import dataclass
 @dataclass
 class EventManager():
@@ -8,7 +8,6 @@ class EventManager():
     clock: clock.Clock
     area_width: int
     area_height: int
-    
     def update(self,delta_time):
         if self.clock.new_day:        
             for entity in self.entity_manager.entities:
