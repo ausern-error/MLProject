@@ -1,5 +1,5 @@
 {
-	"type": "lion",
+	"animal_type": "lion",
 	"texture": "lion.png",
     "max_age": 10,
     "max_days_before_reproduction": 3,
@@ -13,10 +13,10 @@
 		}
 	},
 	"base_speed": 30,
-	"prey:"{
+	"prey":{
 		"sheep": 3
-	}
-    "resource_on_death": "lion_meat"
-    "resource_count_on_death": 3
+	},
+    "resource_on_death": "lion_meat",
+    "resource_count_on_death": 3,
     "starting_number": 10
 }

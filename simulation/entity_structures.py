@@ -65,10 +65,11 @@ class Animal(Entity):
 
         self.resource_count = dict.fromkeys(self.resource_requirements,0)
         self.days_before_reproduction = self.max_days_before_reproduction
-    def load_animal(animal, entity_manager):
+    def load(animal, entity_manager):
+        import simulation.resources
         for i in range(0,animal["starting_number"]):
-            Animal(Vector2(0,0),entity_manager,animal["texture"],animal["animal_type"],0,animal["max_age"],animal["max_days_before_reproduction"],None,None,Task.wander,AnimalResourceRequirements.decode(animal["resource_requirements"]),animal["base_speed"],animal["prey"],animal["resource_on_death"],animal["resource_count_on_death"])
-            #Do proper spawing coords
+            Animal(Vector2(random.randint(0,entity_manager.map_size.x),random.randint(0,entity_manager.map_size.y)),entity_manager,animal["texture"],animal["animal_type"],0,animal["max_age"],animal["max_days_before_reproduction"],None,None,Task.wander,simulation.resources.AnimalResourceRequirements.decode_dict(animal["resource_requirements"]),animal["base_speed"],animal["prey"],animal["resource_on_death"],animal["resource_count_on_death"])
+    
     def update_task(self,delta_time):
         match self.task:
             case Task.wander:
