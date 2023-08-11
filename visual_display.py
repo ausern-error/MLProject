@@ -319,7 +319,7 @@ def main():  # MAIN FUNCTION
         #TODO: test on different refresh rates
         )
     
-    )
+    
     font_loader(fonts)
     menu_view = MenuView()
     menu_view.setup()
