@@ -3,6 +3,7 @@ from enum import Enum
 import random
 import math
 import simulation.clock
+import simulation.output
 #TODO: Type annotate lists
 @dataclass
 class Vector2:
@@ -28,6 +29,8 @@ class EntityManager():
     entities: list
     map_size: Vector2 #temporary maybe :)
     clock: simulation.clock.Clock
+    stats: simulation.output.Stats
+
 @dataclass
 class Entity:
     position: Vector2     
@@ -60,11 +63,10 @@ class Animal(Entity):
     def __post_init__(self):
         super().__post_init__()
         self.target = self
-
         self.task = Task.wander
-
         self.resource_count = dict.fromkeys(self.resource_requirements,0)
         self.days_before_reproduction = self.max_days_before_reproduction
+        self.entity_manager.stats.populations[self.animal_type] += 1
     def load(animal, entity_manager):
         import simulation.resources
         for i in range(0,animal["starting_number"]):

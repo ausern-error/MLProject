@@ -3,11 +3,9 @@ import json
 import random
 import arcade
 import random
-from simulation import entity_structures,resources,clock,event_manager
+from simulation import entity_structures,resources,clock,event_manager, output
 
 import time
-from simulation import entity_structures
-from simulation import resources
 
 import os
 from arcade.gui import *
@@ -72,6 +70,7 @@ class Cloud(arcade.Sprite):
 class MenuView(arcade.View):  # MENU VIEW
     def __init__(self):
         super().__init__()
+        self.stats = output.Stats()
 
         self.texture_path = "./data/texture/MenuBackgrounds/"  # texture path
 
@@ -192,7 +191,7 @@ class MenuView(arcade.View):  # MENU VIEW
     def on_click_StartSimulation(self, event):
         print("View Change To SimulationView")
         self.ui_manager.disable()  # Unloads buttons
-        simulation_view = SimulationView()        
+        simulation_view = SimulationView(self.stats)          
         self.window.show_view(simulation_view)  # Changes View
 
     def on_click_settings(self, event):
@@ -209,10 +208,7 @@ class MenuView(arcade.View):  # MENU VIEW
 
 
 class SimulationView(arcade.View):      
-    def __init__(self):
-
-
-
+    def __init__(self,stats):
         super().__init__()
         arcade.set_background_color(arcade.color.BATTLESHIP_GREY)
         #camera
@@ -233,14 +229,15 @@ class SimulationView(arcade.View):
 
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
         self.clock = clock.Clock(5)
-
-        self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock)
+        self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats)
         
-        a = entity_structures.Animal(entity_structures.Vector2(256,32),self.entity_manager,"animal_sheep","animal_sheep",0,32,3,list(),list(),entity_structures.Task.wander,{"herbivore_food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,0)),"water":resources.AnimalResourceRequirements(True,True,1,(0,10),(0,0))},32,None,"carnivore_food",3)
-        self.b = entity_structures.Animal(entity_structures.Vector2(32,32),self.entity_manager,"animal_sheep","animal_sheep",0,32,3,list(),list(),entity_structures.Task.wander,{"herbivore_food":resources.AnimalResourceRequirements(True,True,3,(0,10),(0,0)),"water":resources.AnimalResourceRequirements(True,True,1,(0,10),(0,0))},128,None,"carnivore_food",3)
-        self.b.days_before_reproduction = 0
         self.resource_manager = resources.ResourceManager(self.path_to_data)
-
+        for path in os.listdir(os.path.join(self.path_to_data, "animals")):
+            with open(os.path.join(self.path_to_data, "animals",path)) as animal:
+                decoded_animal = json.load(animal)
+                stats.populations[decoded_animal["animal_type"]] = 0
+                entity_structures.Animal.load(decoded_animal,self.entity_manager)
+        
         #event manager
         self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT);
     def setup(self):
@@ -325,7 +322,8 @@ def main():  # MAIN FUNCTION
     menu_view.setup()
     window.show_view(menu_view)  # Changes View To Menu
     arcade.run()
-
+    menu_view.stats.create_json()
+    
 
 if __name__ == "__main__":
     main()

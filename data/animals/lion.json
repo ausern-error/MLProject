@@ -1,6 +1,6 @@
 {
 	"animal_type": "lion",
-	"texture": "lion.png",
+	"texture": "animal_sheep",
     "max_age": 10,
     "max_days_before_reproduction": 3,
 	"resource_requirements": {
