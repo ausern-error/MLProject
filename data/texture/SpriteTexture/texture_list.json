@@ -1,9 +1,14 @@
 {
-	"animal_sheep": {
-		"texture_name": "animal_sheep.png",
+	"animal_deer": {
+		"texture_name": "animal_deer.png",
 		"width": 32,
 		"height": 32
 	},
+	"animal_lion": {
+		"texture_name": "animal_lion.png",
+		"width": 32,
+		"height": 32
+	},	
 	"resource_herbivore_food":  {
 		"texture_name": "resource_herbivore_food.png",
 		"width": 32,

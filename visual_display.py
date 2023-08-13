@@ -236,6 +236,7 @@ class SimulationView(arcade.View):
             with open(os.path.join(self.path_to_data, "animals",path)) as animal:
                 decoded_animal = json.load(animal)
                 stats.populations[decoded_animal["animal_type"]] = 0
+                stats.populations_per_day[decoded_animal["animal_type"]] = list()
                 entity_structures.Animal.load(decoded_animal,self.entity_manager)
         
         #event manager
@@ -260,19 +261,28 @@ class SimulationView(arcade.View):
                 temp_texture = self.arcade_texture_list[entity.texture_name]
                 temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
                 #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
-        
-        # Performance
-        self.fps_text = arcade.Text(  # Updates FPS
+            if type(entity) is entity_structures.Animal:
+                #arcade.Text( text=str(entity.task),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
+                pass
+            
+        arcade.Text(  # Updates FPS
             text=f"FPS:{round(arcade.get_fps())}",
-            start_x=10, start_y=1049,
-            color=arcade.color.ALMOND)
+            start_x=10, start_y=10,
+            color=arcade.color.ALMOND).draw()
+        arcade.Text(  # current day
+            text="day:" + str(self.clock.day_counter),
+            start_x=10, start_y=20,
+            color=arcade.color.ALMOND).draw()
 
-        self.fps_text.draw()  # Draws FPS
 
     def on_update(self, delta_time):
         for entity in self.entity_manager.entities:
             entity.update(delta_time)
-        self.clock.tick(delta_time)            
+
+        self.clock.tick(delta_time)
+        if self.clock.new_day:
+            for key, value in self.entity_manager.stats.populations.items():
+                self.entity_manager.stats.populations_per_day[key].append(value)
         self.event_manager.update(delta_time)
 
     def on_key_press(self, key, modifiers):
