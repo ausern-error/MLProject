@@ -1,23 +1,23 @@
 {
 	"animal_type": "deer",
 	"texture": "animal_deer",
-    "max_age": 10,
-    "max_days_before_reproduction": 1,
+    "max_age": 3,
+    "max_days_before_reproduction": 2,
 	"resource_requirements": {
 		"herbivore_food": {
 			"neededForSurvival": true,
 			"neededForReproduction": true,
 			"priority": 0,
-			"dailyUsageRate": [0, 1],
+			"dailyUsageRate": [1, 1],
 			"reproductionUsageRate": [0, 2]
 		}
 		
 	},
 	"base_speed": [80,100],
     "resource_on_death": "carnivore_food",
-    "resource_count_on_death": 3,
-    "starting_number": 15,
-	"reproduction_reward": 1000,
+    "resource_count_on_death": 12,
+    "starting_number": 100,
+	"reproduction_reward": 100,
 	"living_reward":0,
 	"gathering_reward": 20,
 	"hunting_reward": -10,
