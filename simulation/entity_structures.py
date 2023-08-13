@@ -83,6 +83,7 @@ class Animal(Entity):
        
     def destroy(self):
         self.entity_manager.stats.populations[self.animal_type] -= 1
+        
         Entity.destroy(self)
     def load(animal, entity_manager):
         import simulation.resources
@@ -176,7 +177,8 @@ class Animal(Entity):
             self.target = Vector2(random.randint(0,self.entity_manager.map_size.x),random.randint(0,self.entity_manager.map_size.y))
         if self.pathfind_until(self.target,delta_time,32):
             self.target = Vector2(random.randint(0,self.entity_manager.map_size.x),random.randint(0,self.entity_manager.map_size.y))
-
+        else:
+            self.update_task(delta_time)
     def gather(self,delta_time):
         import simulation.resources
         #consider which resource is highest priority
@@ -196,7 +198,7 @@ class Animal(Entity):
             self.update_task(delta_time)
         else:
             targets.sort(key=lambda x:x.position.distance_to(self.position),reverse=False)
-            if (self.target != targets[0] and not self.target in self.entity_manager.entities) or self.target == self or not type(self.target) is simulation.resources.Resource:
+            if self.target != targets[0] or not type(self.target) is simulation.resources.Resource:
                 self.target = targets[0]
             if self.pathfind_until(self.target.position,delta_time,32): #TODO: make this texture_size for bounding_box
                 self.resource_count[self.target.name] += self.target.quantity
@@ -213,16 +215,17 @@ class Animal(Entity):
                 return
         targets = list()
         for entity in self.entity_manager.entities:
-            if type(entity) is Animal:   
-                if entity.animal_type == self.animal_type and entity != self:
-                    targets.append(entity)
+            if type(entity) is Animal and not id(entity) is id(self):   
+                targets.append(entity)
         if not targets:
             self.update_task(delta_time)
+            return
         else:
             targets.sort(key=lambda x:x.position.distance_to(self.position),reverse=False)
             if (self.target != targets[0] and (self.children == None or not self.target in self.children)) or self.target == self:
                 self.target = targets[0]
-                return
+                
+                
             if self.pathfind_until(self.target.position,delta_time,32): #TODO: make this texture_size for bounding_box
 
                 child = Animal(self.position,self.entity_manager,self.texture_name,self.animal_type,0,self.max_age,self.max_days_before_reproduction,list(),[self,self,targets[0]],Task.wander,self.resource_requirements,random.choice([self.speed,targets[0].speed]),self.prey,self.resource_on_death,self.resource_count_on_death,self.reproduction_reward,self.living_reward,self.gathering_reward,self.hunting_reward,self.death_by_hunger_reward,self.experimentation_factor,self.experimentation_factor_decay)
@@ -236,6 +239,7 @@ class Animal(Entity):
                     self.resource_count[resource_name] -= usage
                 days_before_reproduction = self.max_days_before_reproduction
                 self.update_task(delta_time)
+                child.update_task(delta_time)
 
     def hunt(self,delta_time):
     #TODO decide on if to have seperate targets for each activity
@@ -279,9 +283,10 @@ class Animal(Entity):
             self.update_task(delta_time)
         predators = list()
         for entity in self.entity_manager.entities:
-            if type(entity) == type(self) and entity.target == self:
+            if type(entity) is type(Animal) and entity.target == self:
                 predators.append(entity)
         if not predators:
+            self.update_task(delta_time)
             return
         predators = sorted(predators,key=lambda x: x.position.distance_to(self.position))
         #determine corners
