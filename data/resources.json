@@ -4,12 +4,6 @@
 		"spawn_chance": 100,
 		"spawn_amount": [0,15],
 		"quantity": 3
-	},
-	"water": {
-		"texture": "resource_water",
-		"spawn_chance": 100,
-		"spawn_amount": [0,32],
-		"quantity": 3	
 	}
 
 }
