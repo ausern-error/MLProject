@@ -4,6 +4,7 @@ import random
 import arcade
 import random
 from simulation import entity_structures,resources,clock,event_manager, output
+import matplotlib.pyplot as plt
 
 import time
 
@@ -262,7 +263,7 @@ class SimulationView(arcade.View):
                 temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
                 #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
             if type(entity) is entity_structures.Animal:
-                arcade.Text( text=str(entity.task),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
+                #arcade.Text( text=str(entity.task),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
                 pass
             
         arcade.Text(  # Updates FPS
@@ -333,7 +334,19 @@ def main():  # MAIN FUNCTION
     window.show_view(menu_view)  # Changes View To Menu
     arcade.run()
     menu_view.stats.create_json()
-    
+    figure, plots = plt.subplots(2, 1)
+    plots[0].bar(menu_view.stats.populations.keys(),menu_view.stats.populations.values())
+    plots[0].set_title("Final Populations")
+    plots[0].set_ylabel("Population")
+    plots[0].set_xlabel("Animal")
+
+    for key,value in menu_view.stats.populations_per_day.items():
+        plots[1].plot(value,label=str(key))
+    plots[1].set_title("Final Population Per Day")
+    plots[1].set_ylabel("Population")
+    plots[1].set_xlabel("Days")
+    plt.legend(loc='upper center')
+    plt.show()
 
 if __name__ == "__main__":
     main()

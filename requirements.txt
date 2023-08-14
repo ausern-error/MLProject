@@ -1,5 +1,7 @@
-arcade
-arcade.gui
+arcade (LATEST DEV VERSION)
+arcade.gui 
 time
 json
 random
+os
+matplotlib
