@@ -52,8 +52,8 @@ class Cloud(arcade.Sprite):
         self.change_y = 0
 
         self.position = (
-            random.randrange(0, 2000),
-            random.randrange(700, 1065)
+            random.randrange(0, 1400),
+            random.randrange(650, 860)
         )
 
     def update(self):
@@ -62,10 +62,14 @@ class Cloud(arcade.Sprite):
             self.position[1] + self.change_y
 
         )
-
-        if self.position[0] > 2000:
+        
+        # Velocity
+        self.change_x = random.uniform(0.4, 1.5)
+        self.change_y = 0
+        
+        if self.position[0] > 1980:
             self.center_x = 0
-            self.center_y = random.randrange(700, 1065)
+            self.center_y = random.randrange(650, 860)
 
 
 class MenuView(arcade.View):  # MENU VIEW
@@ -84,9 +88,9 @@ class MenuView(arcade.View):  # MENU VIEW
 
         # Creating text object for heading & author
         self.heading_text = arcade.Text(
-            "Evolving  Simulations  of  Animal  Behavior", self.window.width-1615, self.window.height/2+320,
+            "Evolving  Simulations  of  Animal  Behavior", self.window.width/2, self.window.height/2+100     ,
             arcade.color.WHITE, font_size=50,
-            anchor_x="left",
+            anchor_x="center",
             anchor_y="bottom",
             font_name="Ticketing")
         self.author_text = arcade.Text(
@@ -135,14 +139,11 @@ class MenuView(arcade.View):  # MENU VIEW
         # Creates Buttons
         simulation_button = arcade.gui.widgets.buttons.UIFlatButton(
             text="Start Simulation", width=350, height=43, style=button_style)
-        settings_button = arcade.gui.widgets.buttons.UIFlatButton(
-            text="Settings", width=350, height=43, style=button_style)
         exit_button = arcade.gui.widgets.buttons.UIFlatButton(
             text="Exit", width=350, height=43, style=button_style)
 
         # Adds Buttons To The Vertical Box
         self.v_box.add(simulation_button)
-        self.v_box.add(settings_button)
         self.v_box.add(exit_button)
 
         # Creates Widget
@@ -153,7 +154,6 @@ class MenuView(arcade.View):  # MENU VIEW
 
         # Button Click Events
         simulation_button.on_click = self.on_click_StartSimulation
-        settings_button.on_click = self.on_click_settings
         exit_button.on_click = self.on_click_quit
 
         #cute cloudies
@@ -163,7 +163,7 @@ class MenuView(arcade.View):  # MENU VIEW
     
     def add_clouds(self, amount):  # TODO: Reference Window for Spawning of Clouds
         for i in range(amount):
-            cloud = Cloud(self.cloud_textures[(random.randrange(0, self.arr_len))], random.uniform(0.8, 2))
+            cloud = Cloud(self.cloud_textures[(random.randrange(0, self.arr_len))], random.uniform(0.8, 1.7))
             self.cloud_list.append(cloud)
 
     def setup(self):
@@ -194,13 +194,6 @@ class MenuView(arcade.View):  # MENU VIEW
         self.ui_manager.disable()  # Unloads buttons
         simulation_view = SimulationView(self.stats)          
         self.window.show_view(simulation_view)  # Changes View
-
-    def on_click_settings(self, event):
-        print("View Change To SettingsView")
-        self.ui_manager.disable()  # Unloads buttons
-        settings_view = SettingsView()
-        settings_view.on_draw()
-        self.window.show_view(settings_view)  # Changes View
 
     def on_click_quit(self, event):
         print("Quit button pressed")
@@ -239,7 +232,7 @@ class SimulationView(arcade.View):
                 stats.populations[decoded_animal["animal_type"]] = 0
                 stats.populations_per_day[decoded_animal["animal_type"]] = list()
                 entity_structures.Animal.load(decoded_animal,self.entity_manager)
-        self.side_display = entity_structures.Entity(entity_structures.Vector2(WINDOW_WIDTH-100,WINDOW_HEIGHT),self.entity_manager,"side_display")
+        self.side_display = entity_structures.Entity(entity_structures.Vector2(WINDOW_WIDTH-483,WINDOW_HEIGHT-200),self.entity_manager,"side_display")
         #event manager
         self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT)
 
@@ -301,25 +294,6 @@ class SimulationView(arcade.View):
         self.window.show_view(menu_view)
 
 
-class SettingsView(arcade.View):  # SETTINGS VIEW
-    def __init__(self):
-        super().__init__()
-        arcade.set_background_color(arcade.color.JAPANESE_CARMINE)
-
-    def on_key_press(self, key, modifiers):
-        if key == arcade.key.ESCAPE:
-            self.MenuView_Change()
-
-    def MenuView_Change(self):
-        print("View Change To MenuView")
-        menu_view = MenuView()
-        menu_view.setup()
-        self.window.show_view(menu_view)
-
-    def on_draw(self):
-        self.clear()
-
-
 def main():  # MAIN FUNCTION
     window = arcade.Window(  # Creates window
         width=WINDOW_WIDTH,
@@ -327,7 +301,7 @@ def main():  # MAIN FUNCTION
         title=WINDOW_TITLE,
         antialiasing=True,
         enable_polling=True,
-        fullscreen=False
+        fullscreen=True
         #TODO: test on different refresh rates
         )
     
