@@ -1,8 +1,8 @@
 {
 	"herbivore_food": {
 		"texture": "resource_herbivore_food",
-		"spawn_chance": 100,
-		"spawn_amount": [0,40],
+		"spawn_chance": 70,
+		"spawn_amount": [0,15],
 		"quantity": 3
 	}
 

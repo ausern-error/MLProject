@@ -12,7 +12,7 @@ class EventManager():
         if self.clock.new_day:        
             for entity in self.entity_manager.entities:
                 if entity.entity_type == entity_structures.EntityType.resource:
-                    #entity.destroy()
+                    entity.destroy()
                     pass
             for resource_name, resource in self.resource_manager.resources.items():  #TODO: add config option for this
                 if random.randint(0,100) <= resource[self.resource_manager.SPAWNCHANCE]:
