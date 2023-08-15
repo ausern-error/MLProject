@@ -285,10 +285,10 @@ class Animal(Entity):
                 self.target.states[State.chased] = True
                 self.target.update_task(delta_time)
             if self.pathfind_until(self.target.position,delta_time,32) :
-                if self.target.animal_type in self.resource_count:
-                    self.resource_count[self.target.animal_type] += self.target.resource_count_on_death
+                if self.target.resource_on_death in self.resource_count:
+                    self.resource_count[self.target.resource_on_death] += self.target.resource_count_on_death
                 else:
-                    self.resource_count[self.target.animal_type] = self.target.resource_count_on_death
+                    self.resource_count[self.target.resource_on_death] = self.target.resource_count_on_death
                 self.target.destroy()
                 self.hunt_per_day += 1
 
