@@ -218,7 +218,7 @@ class SimulationView(arcade.View):
         self.arcade_texture_list = dict()
         self.path_to_data = os.path.join(".","data")
         self.sprite_texture_path = "./data/texture/SpriteTexture/"  # Path To Sprite Texture
-
+        self.stats = stats
         with open(os.path.join(self.sprite_texture_path, "texture_list.json")) as texture_json:
             texture_list = json.load(texture_json)
 
@@ -239,9 +239,11 @@ class SimulationView(arcade.View):
                 stats.populations[decoded_animal["animal_type"]] = 0
                 stats.populations_per_day[decoded_animal["animal_type"]] = list()
                 entity_structures.Animal.load(decoded_animal,self.entity_manager)
-        
+        self.side_display = entity_structures.Entity(entity_structures.Vector2(WINDOW_WIDTH-100,WINDOW_HEIGHT),self.entity_manager,"side_display")
         #event manager
-        self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT);
+        self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT)
+
+
     def setup(self):
         self.fps_text = arcade.Text(
             text=f"FPS:{round(arcade.get_fps())}",
@@ -265,17 +267,19 @@ class SimulationView(arcade.View):
             if type(entity) is entity_structures.Animal:
                 #arcade.Text( text=str(entity.task),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
                 pass
-            
+
+        text = "" 
+        for animal_name,animal_population in self.stats.populations.items():
+            text +=str(animal_name)+":"+str(animal_population)
+        arcade.Text(text=text,start_x=WINDOW_WIDTH-150,start_y=WINDOW_HEIGHT-30,color=arcade.color.RED).draw()
         arcade.Text(  # Updates FPS
             text=f"FPS:{round(arcade.get_fps())}",
-            start_x=10, start_y=10,
+            start_x=WINDOW_WIDTH-150, start_y=WINDOW_HEIGHT-10,
             color=arcade.color.ALMOND).draw()
         arcade.Text(  # current day
             text="day:" + str(self.clock.day_counter),
-            start_x=10, start_y=20,
+            start_x=WINDOW_WIDTH-150, start_y=WINDOW_HEIGHT-20,
             color=arcade.color.ALMOND).draw()
-
-
     def on_update(self, delta_time):
         for entity in self.entity_manager.entities:
             entity.update(delta_time)
