@@ -265,10 +265,7 @@ class SimulationView(arcade.View):
                 temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
                 #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
             if type(entity) is entity_structures.Animal:
-                if entity.animal_type == "lion":
-                    arcade.Text( text=str(entity.resource_count["carnivore_food"]),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
-
-                #arcade.Text( text=str(entity.task),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
+                #arcade.Text( text=str(entity.hunt_per_day),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
                 pass
 
         text = "" 
