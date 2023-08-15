@@ -24,10 +24,10 @@
 		"width": 32,
 		"height": 32
 	},
-	"side_display":{
-		"texture_name": "side_display.png",
-		"width": 200,
-		"height": 1280		
+	"simulation_background":{
+		"texture_name": "simulation_background.jpg",
+		"width": 1920,
+		"height": 1080			
 		
 	}
 }

@@ -232,7 +232,7 @@ class SimulationView(arcade.View):
                 stats.populations[decoded_animal["animal_type"]] = 0
                 stats.populations_per_day[decoded_animal["animal_type"]] = list()
                 entity_structures.Animal.load(decoded_animal,self.entity_manager)
-        self.side_display = entity_structures.Entity(entity_structures.Vector2(WINDOW_WIDTH-483,WINDOW_HEIGHT-200),self.entity_manager,"side_display")
+        self.simulation_background = entity_structures.Entity(entity_structures.Vector2(0,0),self.entity_manager,"simulation_background")
         #event manager
         self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT)
 
@@ -328,3 +328,4 @@ def main():  # MAIN FUNCTION
 
 if __name__ == "__main__":
     main()
+
