@@ -14,7 +14,7 @@ class ResourceManager():
     path_to_data: str
     def __post_init__(self):
         self.resources = list()
-        self.TEXTURE = "texture"
+        self.TEXTURES = "textures"
         self.SPAWNCHANCE = "spawn_chance"
         self.SPAWNAMOUNT = "spawn_amount" 
         self.QUANTITY = "quantity" #how much each resource gives on collection
