@@ -135,10 +135,10 @@ class Animal(Entity):
             self.task = random.randint(Task.wander,Task.escape)
         else:
             #choose action with highest reward value
-            if sorted(self.table[current_state])[0] == Task.hunt and self.hunt_per_day > self.max_hunt_per_day:
+            if sorted(self.table[current_state])[0] == Task.hunt and self.hunt_per_day >= self.max_hunt_per_day:
                 self.task = sorted(self.table[current_state])[1]
             else:
-                self.task = sorted(self.table[current_state])[1]
+                self.task = sorted(self.table[current_state])[0]
 
     def update(self,delta_time):
         if self.entity_manager.clock.new_day and self.entity_manager.clock.day_counter >1:
@@ -214,12 +214,10 @@ class Animal(Entity):
                 self.update_task(delta_time)
                 
     def reproduce(self,delta_time):
-        if self.days_before_reproduction >= self.max_days_before_reproduction:
+        if self.days_before_reproduction > 0:
             self.update_task(delta_time)
             return
         for resource_name,resource_requirement in self.resource_requirements.items():
-            if self.animal_type == "lion":
-                print(resource_name)
             if self.resource_count[resource_name] < resource_requirement.reproductionUsageRate[1]:
                 self.update_task(delta_time)
                 return
@@ -249,10 +247,11 @@ class Animal(Entity):
                     usage = random.randint(resource_requirement.reproductionUsageRate[0],resource_requirement.reproductionUsageRate[1])
                     child.resource_count[resource_name] = usage
                     self.resource_count[resource_name] -= usage
-                days_before_reproduction = self.max_days_before_reproduction
+
+                self.days_before_reproduction = self.max_days_before_reproduction
                 self.update_task(delta_time)
                 child.update_task(delta_time)
-
+                child.days_before_reproduction = self.max_days_before_reproduction 
     def hunt(self,delta_time):
         if self.hunt_per_day >= self.max_hunt_per_day:
             self.update_task(delta_time)
@@ -275,7 +274,7 @@ class Animal(Entity):
         if not targets:
             self.update_task(delta_time)
             pass
-        elif self.hunt_per_day <= self.max_hunt_per_day:
+        elif self.hunt_per_day < self.max_hunt_per_day:
             targets.sort(key=lambda x:x.position.distance_to(self.position),reverse=False)
             if (self.target != targets[0] and not self.target in self.entity_manager.entities) or self.target == self:
                 self.target = targets[0]
@@ -285,10 +284,10 @@ class Animal(Entity):
                 self.target.states[State.chased] = True
                 self.target.update_task(delta_time)
             if self.pathfind_until(self.target.position,delta_time,32) :
-                if self.target.animal_type in self.resource_count:
-                    self.resource_count[self.target.animal_type] += self.target.resource_count_on_death
+                if self.target.resource_on_death in self.resource_count:
+                    self.resource_count[self.target.resource_on_death] += self.target.resource_count_on_death
                 else:
-                    self.resource_count[self.target.animal_type] = self.target.resource_count_on_death
+                    self.resource_count[self.target.resource_on_death] = self.target.resource_count_on_death
                 self.target.destroy()
                 self.hunt_per_day += 1
 
