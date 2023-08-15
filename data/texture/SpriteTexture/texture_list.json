@@ -14,9 +14,11 @@
 		"width": 32,
 		"height": 32
 	},
-	"resource_water":  {
-		"texture_name": "resource_water.png",
-		"width": 32,
-		"height": 32
+
+	"side_display":{
+		"texture_name": "side_display.png",
+		"width": 200,
+		"height": 1280		
+		
 	}
 }

@@ -70,6 +70,7 @@ class Animal(Entity):
     death_by_hunger_reward: int
     experimentation_factor: int
     experimentation_factor_decay: int
+    max_hunt_per_day: int
     def __post_init__(self):
         super().__post_init__()
         self.target = self
@@ -80,16 +81,19 @@ class Animal(Entity):
         self.chased = False
         self.states = [False,False,False,False]
         self.table = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-       
+        self.hunt_per_day = 0
     def destroy(self):
         self.entity_manager.stats.populations[self.animal_type] -= 1
-        Entity.destroy(self)
+        if self in self.entity_manager.entities:
+            Entity.destroy(self)
     def load(animal, entity_manager):
         import simulation.resources
         for i in range(0,animal["starting_number"]):
             if not "prey" in animal:
                 animal["prey"] = None
-            Animal(Vector2(random.randint(0,entity_manager.map_size.x),random.randint(0,entity_manager.map_size.y)),entity_manager,animal["texture"],animal["animal_type"],0,animal["max_age"],animal["max_days_before_reproduction"],None,None,Task.wander,simulation.resources.AnimalResourceRequirements.decode_dict(animal["resource_requirements"]),random.randint(animal["base_speed"][0],animal["base_speed"][1]),animal["prey"],animal["resource_on_death"],animal["resource_count_on_death"],animal["reproduction_reward"],animal["living_reward"],animal["gathering_reward"],animal["hunting_reward"],animal["death_by_hunger_reward"],animal["experimentation_factor"],animal["experimentation_factor_decay"])
+            if not "max_hunt_per_day" in animal:
+                animal["max_hunt_per_day"] = 0
+            Animal(Vector2(random.randint(0,entity_manager.map_size.x),random.randint(0,entity_manager.map_size.y)),entity_manager,animal["texture"],animal["animal_type"],0,animal["max_age"],animal["max_days_before_reproduction"],None,None,Task.wander,simulation.resources.AnimalResourceRequirements.decode_dict(animal["resource_requirements"]),random.randint(animal["base_speed"][0],animal["base_speed"][1]),animal["prey"],animal["resource_on_death"],animal["resource_count_on_death"],animal["reproduction_reward"],animal["living_reward"],animal["gathering_reward"],animal["hunting_reward"],animal["death_by_hunger_reward"],animal["experimentation_factor"],animal["experimentation_factor_decay"],animal["max_hunt_per_day"])
     
     def update_task(self,delta_time):
         #consider current State
@@ -109,6 +113,7 @@ class Animal(Entity):
             self.states[State.low_living_resources] = True
         else:
             self.states[State.low_living_resources] = False
+            
         if reproduction_count > 0:
             self.states[State.low_reproduction_resources] = True
             self.states[State.high_reproduction_resources] = False
@@ -123,17 +128,21 @@ class Animal(Entity):
             for statee in self.states:
                 if statee:
                     true_states.append(statee)
+            
             current_state = random.choice(true_states)
         if random.randint(0,100) <= self.experimentation_factor:
             #experiment 
             self.task = random.randint(Task.wander,Task.escape)
         else:
             #choose action with highest reward value
-            self.task = sorted(self.table[current_state])[0]
-            
+            if sorted(self.table[current_state])[0] == Task.hunt and self.hunt_per_day >= self.max_hunt_per_day:
+                self.task = sorted(self.table[current_state])[1]
+            else:
+                self.task = sorted(self.table[current_state])[0]
 
     def update(self,delta_time):
-        if self.entity_manager.clock.new_day:
+        if self.entity_manager.clock.new_day and self.entity_manager.clock.day_counter >1:
+            self.hunt_per_day = 0
             self.update_task(delta_time)
 
             for resource_name,resource_requirement in self.resource_requirements.items():
@@ -144,10 +153,10 @@ class Animal(Entity):
                 if self.resource_count[resource_name] < 0 and resource_requirement.neededForSurvival:
                     for i in range(0,len(self.states)):
                         if self.states[i]:
-                            self.table[i][self.Task] -= self.death_by_hunger_reward
+                            self.table[i][self.task] -= self.death_by_hunger_reward
                             if self.children:
                                 for child in self.children:
-                                    child.table[i][self.Task] -= self.death_by_hunger_reward
+                                    child.table[i][self.task] -= self.death_by_hunger_reward
                     self.destroy()
             if self.days_before_reproduction > 0:
                 self.days_before_reproduction -= 1
@@ -176,7 +185,8 @@ class Animal(Entity):
             self.target = Vector2(random.randint(0,self.entity_manager.map_size.x),random.randint(0,self.entity_manager.map_size.y))
         if self.pathfind_until(self.target,delta_time,32):
             self.target = Vector2(random.randint(0,self.entity_manager.map_size.x),random.randint(0,self.entity_manager.map_size.y))
-
+        else:
+            self.update_task(delta_time)
     def gather(self,delta_time):
         import simulation.resources
         #consider which resource is highest priority
@@ -196,7 +206,7 @@ class Animal(Entity):
             self.update_task(delta_time)
         else:
             targets.sort(key=lambda x:x.position.distance_to(self.position),reverse=False)
-            if (self.target != targets[0] and not self.target in self.entity_manager.entities) or self.target == self or not type(self.target) is simulation.resources.Resource:
+            if self.target != targets[0] or not type(self.target) is simulation.resources.Resource:
                 self.target = targets[0]
             if self.pathfind_until(self.target.position,delta_time,32): #TODO: make this texture_size for bounding_box
                 self.resource_count[self.target.name] += self.target.quantity
@@ -204,28 +214,31 @@ class Animal(Entity):
                 self.update_task(delta_time)
                 
     def reproduce(self,delta_time):
-        if self.days_before_reproduction >= self.max_days_before_reproduction:
+        if self.days_before_reproduction > 0:
             self.update_task(delta_time)
             return
         for resource_name,resource_requirement in self.resource_requirements.items():
             if self.resource_count[resource_name] < resource_requirement.reproductionUsageRate[1]:
                 self.update_task(delta_time)
                 return
+
+
         targets = list()
         for entity in self.entity_manager.entities:
-            if type(entity) is Animal:   
-                if entity.animal_type == self.animal_type and entity != self:
-                    targets.append(entity)
+            if type(entity) is Animal and not id(entity) is id(self) and entity.animal_type == self.animal_type:   
+                targets.append(entity)
         if not targets:
             self.update_task(delta_time)
+            return
         else:
             targets.sort(key=lambda x:x.position.distance_to(self.position),reverse=False)
-            if (self.target != targets[0] and (self.children == None or not self.target in self.children)) or self.target == self:
+            if (self.target != targets[0] and (self.children == None or not self.target in self.children)) or id(self.target) is id( self):
                 self.target = targets[0]
-                return
+                
+                
             if self.pathfind_until(self.target.position,delta_time,32): #TODO: make this texture_size for bounding_box
 
-                child = Animal(self.position,self.entity_manager,self.texture_name,self.animal_type,0,self.max_age,self.max_days_before_reproduction,list(),[self,self,targets[0]],Task.wander,self.resource_requirements,random.choice([self.speed,targets[0].speed]),self.prey,self.resource_on_death,self.resource_count_on_death,self.reproduction_reward,self.living_reward,self.gathering_reward,self.hunting_reward,self.death_by_hunger_reward,self.experimentation_factor,self.experimentation_factor_decay)
+                child = Animal(Vector2(random.randint(0,self.entity_manager.map_size.x),random.randint(0,self.entity_manager.map_size.y)),self.entity_manager,self.texture_name,self.animal_type,0,self.max_age,self.max_days_before_reproduction,list(),[self,self,targets[0]],Task.wander,self.resource_requirements,random.choice([self.speed,targets[0].speed]),self.prey,self.resource_on_death,self.resource_count_on_death,self.reproduction_reward,self.living_reward,self.gathering_reward,self.hunting_reward,self.death_by_hunger_reward,self.experimentation_factor,self.experimentation_factor_decay,self.max_hunt_per_day)
                 if self.children == None:
                     self.children = [child]
                 else:
@@ -234,13 +247,17 @@ class Animal(Entity):
                     usage = random.randint(resource_requirement.reproductionUsageRate[0],resource_requirement.reproductionUsageRate[1])
                     child.resource_count[resource_name] = usage
                     self.resource_count[resource_name] -= usage
-                days_before_reproduction = self.max_days_before_reproduction
-                self.update_task(delta_time)
 
+                self.days_before_reproduction = self.max_days_before_reproduction
+                self.update_task(delta_time)
+                child.update_task(delta_time)
+                child.days_before_reproduction = self.max_days_before_reproduction 
     def hunt(self,delta_time):
-    #TODO decide on if to have seperate targets for each activity
+        if self.hunt_per_day >= self.max_hunt_per_day:
+            self.update_task(delta_time)
+            return
         if self.prey == None:
-            self.task = Task.escape #temporary will be gone once q learning is done
+            self.task = Task.escape
             return
         prey = sorted(self.prey.items(),key=lambda x: x[1])
         targets = list()
@@ -257,7 +274,7 @@ class Animal(Entity):
         if not targets:
             self.update_task(delta_time)
             pass
-        else:
+        elif self.hunt_per_day < self.max_hunt_per_day:
             targets.sort(key=lambda x:x.position.distance_to(self.position),reverse=False)
             if (self.target != targets[0] and not self.target in self.entity_manager.entities) or self.target == self:
                 self.target = targets[0]
@@ -267,21 +284,23 @@ class Animal(Entity):
                 self.target.states[State.chased] = True
                 self.target.update_task(delta_time)
             if self.pathfind_until(self.target.position,delta_time,32) :
-                if self.target.animal_type in self.resource_count:
-                    self.resource_count[self.target.animal_type] += self.target.resource_count_on_death
+                if self.target.resource_on_death in self.resource_count:
+                    self.resource_count[self.target.resource_on_death] += self.target.resource_count_on_death
                 else:
-                    self.resource_count[self.target.animal_type] = self.target.resource_count_on_death
+                    self.resource_count[self.target.resource_on_death] = self.target.resource_count_on_death
                 self.target.destroy()
-                self.update_task(delta_time)
+                self.hunt_per_day += 1
 
+                self.update_task(delta_time)
     def escape(self,delta_time):
         if not self.chased:
             self.update_task(delta_time)
         predators = list()
         for entity in self.entity_manager.entities:
-            if type(entity) == type(self) and entity.target == self:
+            if type(entity) is type(Animal) and entity.target == self:
                 predators.append(entity)
         if not predators:
+            self.update_task(delta_time)
             return
         predators = sorted(predators,key=lambda x: x.position.distance_to(self.position))
         #determine corners

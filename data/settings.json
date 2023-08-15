@@ -1,11 +1,6 @@
 
 {
-"map_width":"700", "map_height":"700",
-"window_width":"1280", "window_height":"720",
-"max_fps":"200",
-"tickrate":"64",
-"vsync":false,
-"bot_size":"1",
-"playback_spd":"1",
+"map_width":"1330", "map_height":"980",
+"window_width":"1920", "window_height":"1080",
 "window_title":"Machine Learning Project"
 }
