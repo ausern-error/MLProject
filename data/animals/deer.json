@@ -16,7 +16,7 @@
 	"base_speed": [80,100],
     "resource_on_death": "carnivore_food",
     "resource_count_on_death": 12,
-    "starting_number": 10,
+    "starting_number": 100,
 	"reproduction_reward": 100,
 	"living_reward":0,
 	"gathering_reward": 20,

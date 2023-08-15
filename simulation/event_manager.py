@@ -17,4 +17,4 @@ class EventManager():
             for resource_name, resource in self.resource_manager.resources.items():  #TODO: add config option for this
                 if random.randint(0,100) <= resource[self.resource_manager.SPAWNCHANCE]:
                     for i in range(resource[self.resource_manager.SPAWNAMOUNT][0],resource[self.resource_manager.SPAWNAMOUNT][1]):
-                        resources.Resource(entity_structures.Vector2(random.randint(1,self.area_width),random.randint(0,self.area_height)),self.entity_manager,resource[self.resource_manager.TEXTURE],resource_name,resource[self.resource_manager.QUANTITY])
+                        resources.Resource(entity_structures.Vector2(random.randint(1,self.area_width),random.randint(0,self.area_height)),self.entity_manager,random.choice(resource[self.resource_manager.TEXTURES]),resource_name,resource[self.resource_manager.QUANTITY])
