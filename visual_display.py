@@ -53,7 +53,7 @@ class Cloud(arcade.Sprite):
 
         self.position = (
             random.randrange(0, 1400),
-            random.randrange(650, 860)
+            random.randrange(WINDOW_HEIGHT-400, WINDOW_HEIGHT-270)
         )
 
     def update(self):
