@@ -1,5 +1,5 @@
 {
-	"animal_type": "lion",
+	"animal_type": "Lion",
 	"texture": "animal_lion",
     "max_age": 3,
     "max_days_before_reproduction": 1,
