@@ -221,7 +221,7 @@ class SimulationView(arcade.View):
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
         self.clock = clock.Clock(CLOCK_SPEED)
         self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats,self.arcade_texture_list)
-        self.simulation_texture = arcade.load_texture(os.path.join(self.path_to_data,"texture","SpriteTexture","simulation_background.jpg"))
+        self.simulation_texture = arcade.load_texture(os.path.join(self.path_to_data,"texture","SpriteTexture","simulation_background.png"))
         self.resource_manager = resources.ResourceManager(self.path_to_data)
         for path in os.listdir(os.path.join(self.path_to_data, "animals")):
             with open(os.path.join(self.path_to_data, "animals",path)) as animal:
@@ -243,16 +243,16 @@ class SimulationView(arcade.View):
         text = "" 
         for animal_name,animal_population in self.stats.populations.items():
             text +=str(animal_name)+": "+str( animal_population) + str(";  ")
-        arcade.Text(text=text, font_size = 20, start_x=WINDOW_WIDTH-740,start_y=WINDOW_HEIGHT-285,color=arcade.color.RED).draw()
+        arcade.Text(text=text, font_size = 30, start_x=480,start_y=WINDOW_HEIGHT-255,color=arcade.color.WHITE).draw()
         arcade.Text(  # Updates FPS
-            font_size = 20,
+            font_size = 30,
             text=f"FPS: {round(arcade.get_fps())}",
-            start_x=WINDOW_WIDTH-740, start_y=WINDOW_HEIGHT-245,
+            start_x=45, start_y=WINDOW_HEIGHT-255,
             color=arcade.color.ALMOND).draw()
         arcade.Text(  # current day
-            font_size = 20,
+            font_size = 30,
             text="Day Counter: " + str(self.clock.day_counter),
-            start_x=WINDOW_WIDTH-640, start_y=WINDOW_HEIGHT-245,
+            start_x=200, start_y=WINDOW_HEIGHT-255,
             color=arcade.color.ALMOND).draw()
     def on_update(self, delta_time):
         for entity in self.entity_manager.entities:
@@ -283,7 +283,6 @@ def main():  # MAIN FUNCTION
         antialiasing=True,
         enable_polling=True,
         fullscreen=True     
-        #TODO: test on different refresh rates
         )
     
     

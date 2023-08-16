@@ -25,7 +25,7 @@
 		"height": 32
 	},
 	"simulation_background":{
-		"texture_name": "simulation_background.jpg",
+		"texture_name": "simulation_background.png",
 		"width": 1920,
 		"height": 1080			
 		
