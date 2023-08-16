@@ -255,7 +255,8 @@ class SimulationView(arcade.View):
         for entity in self.entity_manager.entities:
             if entity.texture_name in self.arcade_texture_list:
                 temp_texture = self.arcade_texture_list[entity.texture_name]
-                temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
+                temp_texture.draw_scaled(entity.position.x,entity.position.y,1)
+                #temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
                 #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
             if type(entity) is entity_structures.Animal:
                 #arcade.Text( text=str(entity.hunt_per_day),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
@@ -267,7 +268,7 @@ class SimulationView(arcade.View):
         arcade.Text(text=text,start_x=WINDOW_WIDTH-150,start_y=WINDOW_HEIGHT-30,color=arcade.color.RED).draw()
         arcade.Text(  # Updates FPS
             text=f"FPS:{round(arcade.get_fps())}",
-            start_x=WINDOW_WIDTH-150, start_y=WINDOW_HEIGHT-10,
+            start_x=0, start_y=0,
             color=arcade.color.ALMOND).draw()
         arcade.Text(  # current day
             text="day:" + str(self.clock.day_counter),
@@ -317,7 +318,8 @@ def main():  # MAIN FUNCTION
     plots[0].set_title("Final Populations")
     plots[0].set_ylabel("Population")
     plots[0].set_xlabel("Animal")
-
+    for key, value in menu_view.stats.populations.items():
+        menu_view.stats.populations_per_day[key].append(value)
     for key,value in menu_view.stats.populations_per_day.items():
         plots[1].plot(value,label=str(key))
     plots[1].set_title("Final Population Per Day")
