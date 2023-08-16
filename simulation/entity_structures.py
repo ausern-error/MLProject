@@ -4,6 +4,7 @@ import random
 import math
 import simulation.clock
 import simulation.output
+import arcade
 #TODO: Type annotate lists
 @dataclass
 class Vector2:
@@ -34,6 +35,9 @@ class EntityManager():
     map_size: Vector2
     clock: simulation.clock.Clock
     stats: simulation.output.Stats
+    textures: list
+    def __post_init__(self):
+        self.sprite_list = arcade.SpriteList(True)
 
 @dataclass
 class Entity:
@@ -45,9 +49,14 @@ class Entity:
     def __post_init__(self):
         self.entity_manager.entities.append(self)
         self.entity_type = EntityType.none
+        
+        self.sprite = arcade.Sprite(self.entity_manager.textures[self.texture_name],1,self.position.x,self.position.y)
+        self.entity_manager.sprite_list.append(self.sprite)
+        print(self.entity_manager.textures)
     def destroy(self):
         #may need some tweaking for when editing list while itterating
         self.entity_manager.entities.remove(self)
+        self.entity_manager.sprite_list.remove(self.sprite)
 @dataclass
 class Animal(Entity):
     import simulation.resources
@@ -143,6 +152,8 @@ class Animal(Entity):
                 self.task = sorted(self.table[current_state])[0]
 
     def update(self,delta_time):
+        self.sprite.center_x = self.position.x
+        self.sprite.center_y = self.position.y
         if self.entity_manager.clock.new_day and self.entity_manager.clock.day_counter >1:
             self.hunt_per_day = 0
             self.update_task(delta_time)

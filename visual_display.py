@@ -220,10 +220,9 @@ class SimulationView(arcade.View):
                 self.sprite_texture_path, texture_list[texture]["texture_name"]))
             #self.arcade_texture_list[texture].width = texture_list[texture]["width"]
             #self.arcade_texture_list[texture].height = texture_list[texture]["height"]
-
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
         self.clock = clock.Clock(5)
-        self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats)
+        self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats,self.arcade_texture_list)
         self.simulation_texture = arcade.load_texture(os.path.join(self.path_to_data,"texture","SpriteTexture","simulation_background.jpg"))
         self.resource_manager = resources.ResourceManager(self.path_to_data)
         for path in os.listdir(os.path.join(self.path_to_data, "animals")):
@@ -241,30 +240,16 @@ class SimulationView(arcade.View):
         #self.camera.use()
         arcade.draw_texture_rectangle(
             self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.simulation_texture)
-        #TODO: OPTIMISE THIS
-        for entity in self.entity_manager.entities:
-            if entity.texture_name in self.arcade_texture_list:
-                temp_texture = self.arcade_texture_list[entity.texture_name]
-                temp_texture.draw_scaled(entity.position.x,entity.position.y,1)
-                #temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
-                #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
-            if type(entity) is entity_structures.Animal:
-                #arcade.Text( text=str(entity.hunt_per_day),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
-                pass
+        self.entity_manager.sprite_list.draw()
 
         text = "" 
         for animal_name,animal_population in self.stats.populations.items():
             text +=str(animal_name)+": "+str( animal_population) + str(";  ")
         arcade.Text(text=text, font_size = 20, start_x=WINDOW_WIDTH-740,start_y=WINDOW_HEIGHT-285,color=arcade.color.RED).draw()
         arcade.Text(  # Updates FPS
-<<<<<<< HEAD
             font_size = 20,
             text=f"FPS: {round(arcade.get_fps())}",
             start_x=WINDOW_WIDTH-740, start_y=WINDOW_HEIGHT-245,
-=======
-            text=f"FPS:{round(arcade.get_fps())}",
-            start_x=0, start_y=0,
->>>>>>> origin/main
             color=arcade.color.ALMOND).draw()
         arcade.Text(  # current day
             font_size = 20,
@@ -299,7 +284,7 @@ def main():  # MAIN FUNCTION
         title=WINDOW_TITLE,
         antialiasing=True,
         enable_polling=True,
-        fullscreen=True
+        fullscreen=False     
         #TODO: test on different refresh rates
         )
     
