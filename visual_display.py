@@ -245,7 +245,8 @@ class SimulationView(arcade.View):
         for entity in self.entity_manager.entities:
             if entity.texture_name in self.arcade_texture_list:
                 temp_texture = self.arcade_texture_list[entity.texture_name]
-                temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
+                temp_texture.draw_scaled(entity.position.x,entity.position.y,1)
+                #temp_texture.draw_sized(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height)
                 #arcade.draw_texture_rectangle(entity.position.x,entity.position.y,temp_texture.width,temp_texture.height,temp_texture)
             if type(entity) is entity_structures.Animal:
                 #arcade.Text( text=str(entity.hunt_per_day),start_x=entity.position.x, start_y=entity.position.y,color=arcade.color.BLACK,font_size=16).draw()    
@@ -256,9 +257,14 @@ class SimulationView(arcade.View):
             text +=str(animal_name)+": "+str( animal_population) + str(";  ")
         arcade.Text(text=text, font_size = 20, start_x=WINDOW_WIDTH-740,start_y=WINDOW_HEIGHT-285,color=arcade.color.RED).draw()
         arcade.Text(  # Updates FPS
+<<<<<<< HEAD
             font_size = 20,
             text=f"FPS: {round(arcade.get_fps())}",
             start_x=WINDOW_WIDTH-740, start_y=WINDOW_HEIGHT-245,
+=======
+            text=f"FPS:{round(arcade.get_fps())}",
+            start_x=0, start_y=0,
+>>>>>>> origin/main
             color=arcade.color.ALMOND).draw()
         arcade.Text(  # current day
             font_size = 20,
@@ -309,7 +315,8 @@ def main():  # MAIN FUNCTION
     plots[0].set_title("Final Populations")
     plots[0].set_ylabel("Population")
     plots[0].set_xlabel("Animal")
-
+    for key, value in menu_view.stats.populations.items():
+        menu_view.stats.populations_per_day[key].append(value)
     for key,value in menu_view.stats.populations_per_day.items():
         plots[1].plot(value,label=str(key))
     plots[1].set_title("Final Population Per Day")

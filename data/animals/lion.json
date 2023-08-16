@@ -8,8 +8,8 @@
 			"neededForSurvival": true,
 			"neededForReproduction": true,
 			"priority": 0,
-			"dailyUsageRate": [3, 4],
-			"reproductionUsageRate": [1, 2]
+			"dailyUsageRate": [3,4],
+			"reproductionUsageRate": [2,2 ]
 		}
 	},
 	"base_speed": [70,80],
@@ -18,7 +18,7 @@
 	},
     "resource_on_death": "scavanger_meet",
     "resource_count_on_death": 3,
-    "starting_number": 12,
+    "starting_number": 10,
 	"reproduction_reward": 100,
 	"living_reward":-1,
 	"gathering_reward": -10,
@@ -27,4 +27,4 @@
 	"experimentation_factor": 60,
 	"experimentation_factor_decay": 1,
 	"max_hunt_per_day": 1
-}
+}	

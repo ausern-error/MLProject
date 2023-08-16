@@ -86,6 +86,8 @@ class Animal(Entity):
         self.entity_manager.stats.populations[self.animal_type] -= 1
         if self in self.entity_manager.entities:
             Entity.destroy(self)
+        if self.animal_type == "deer":
+            print(self.table)
     def load(animal, entity_manager):
         import simulation.resources
         for i in range(0,animal["starting_number"]):
@@ -212,7 +214,10 @@ class Animal(Entity):
                 self.resource_count[self.target.name] += self.target.quantity
                 self.target.destroy()
                 self.update_task(delta_time)
-                
+                for i in range(0,len(self.states)):
+                    if self.states[i]:
+                        self.table[i][self.task] += self.gathering_reward
+
     def reproduce(self,delta_time):
         if self.days_before_reproduction > 0:
             self.update_task(delta_time)
@@ -252,6 +257,10 @@ class Animal(Entity):
                 self.update_task(delta_time)
                 child.update_task(delta_time)
                 child.days_before_reproduction = self.max_days_before_reproduction 
+                for i in range(0,len(self.states)):
+                    if self.states[i]:
+                        self.table[i][self.task] += self.reproduction_reward
+
     def hunt(self,delta_time):
         if self.hunt_per_day >= self.max_hunt_per_day:
             self.update_task(delta_time)
@@ -290,6 +299,9 @@ class Animal(Entity):
                     self.resource_count[self.target.resource_on_death] = self.target.resource_count_on_death
                 self.target.destroy()
                 self.hunt_per_day += 1
+                for i in range(0,len(self.states)):
+                    if self.states[i]:
+                        self.table[i][self.task] += self.hunting_reward
 
                 self.update_task(delta_time)
     def escape(self,delta_time):
