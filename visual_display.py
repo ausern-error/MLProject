@@ -25,7 +25,7 @@ WINDOW_TITLE = str(settings_json["window_title"])
 
 MAP_WIDTH = int(settings_json["map_width"])
 MAP_HEIGHT = int(settings_json["map_height"])
-
+CLOCK_SPEED = int(settings_json["clock_speed"])
 
 
 
@@ -219,7 +219,7 @@ class SimulationView(arcade.View):
             self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(
                 self.sprite_texture_path, texture_list[texture]["texture_name"]))
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
-        self.clock = clock.Clock(5)
+        self.clock = clock.Clock(CLOCK_SPEED)
         self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats,self.arcade_texture_list)
         self.simulation_texture = arcade.load_texture(os.path.join(self.path_to_data,"texture","SpriteTexture","simulation_background.jpg"))
         self.resource_manager = resources.ResourceManager(self.path_to_data)

@@ -54,7 +54,10 @@ class Entity:
     def destroy(self):
         #may need some tweaking for when editing list while itterating
         self.entity_manager.entities.remove(self)
-        self.entity_manager.sprite_list.remove(self.sprite)
+        try:
+            self.entity_manager.sprite_list.remove(self.sprite)
+        except:
+            pass
 @dataclass
 class Animal(Entity):
     import simulation.resources
@@ -90,11 +93,10 @@ class Animal(Entity):
         self.table = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
         self.hunt_per_day = 0
     def destroy(self):
-        self.entity_manager.stats.populations[self.animal_type] -= 1
         if self in self.entity_manager.entities:
             Entity.destroy(self)
-        if self.animal_type == "deer":
-            print(self.table)
+            self.entity_manager.stats.populations[self.animal_type] -= 1
+
     def load(animal, entity_manager):
         import simulation.resources
         for i in range(0,animal["starting_number"]):
@@ -277,6 +279,7 @@ class Animal(Entity):
         if self.prey == None:
             self.task = Task.escape
             return
+        
         prey = sorted(self.prey.items(),key=lambda x: x[1])
         targets = list()
         prey_counter = 0
@@ -311,7 +314,6 @@ class Animal(Entity):
                 for i in range(0,len(self.states)):
                     if self.states[i]:
                         self.table[i][self.task] += self.hunting_reward
-
                 self.update_task(delta_time)
     def escape(self,delta_time):
         if not self.chased:
