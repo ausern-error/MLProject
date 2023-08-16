@@ -48,11 +48,9 @@ class Entity:
         pass
     def __post_init__(self):
         self.entity_manager.entities.append(self)
-        self.entity_type = EntityType.none
-        
+        self.entity_type = EntityType.none        
         self.sprite = arcade.Sprite(self.entity_manager.textures[self.texture_name],1,self.position.x,self.position.y)
         self.entity_manager.sprite_list.append(self.sprite)
-        print(self.entity_manager.textures)
     def destroy(self):
         #may need some tweaking for when editing list while itterating
         self.entity_manager.entities.remove(self)
@@ -67,7 +65,7 @@ class Animal(Entity):
     children: list 
     parents: list
     task: Task
-    resource_requirements : dict #TODO: type-checking, for now: this dictionary is structured as: (key:resource_name, value= AnimalResourceRequirements')
+    resource_requirements : dict 
     speed: int
     prey: dict #pass as none to indicate herbivore
     resource_on_death: str #its name   
@@ -348,9 +346,6 @@ class Animal(Entity):
     def pathfind_to(self,goal,delta_time):
         snapped_goal = Vector2(self.speed * round(goal.x / self.speed),self.speed * round(goal.y / self.speed))
         #naive pathfinding, good for now
-        #the snapping doesn't account for the animal's position
-        #print("mex:"+str(round(self.position.x)) + ",mey:"+str(round(self.position.y))) 
-        #print("goal:"+str(snapped_goal))
         
         if self.position.x > goal.x:
             self.position.x -= self.speed * delta_time

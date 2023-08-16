@@ -218,8 +218,6 @@ class SimulationView(arcade.View):
         for texture in texture_list:
             self.arcade_texture_list[texture] = arcade.load_texture(os.path.join(
                 self.sprite_texture_path, texture_list[texture]["texture_name"]))
-            #self.arcade_texture_list[texture].width = texture_list[texture]["width"]
-            #self.arcade_texture_list[texture].height = texture_list[texture]["height"]
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
         self.clock = clock.Clock(5)
         self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats,self.arcade_texture_list)
@@ -284,7 +282,7 @@ def main():  # MAIN FUNCTION
         title=WINDOW_TITLE,
         antialiasing=True,
         enable_polling=True,
-        fullscreen=False     
+        fullscreen=True     
         #TODO: test on different refresh rates
         )
     
