@@ -19,11 +19,11 @@
     "resource_on_death": "scavanger_meet",
     "resource_count_on_death": 3,
     "starting_number": 15,
-	"reproduction_reward": 10,
+	"reproduction_reward": 100,
 	"living_reward":-1,
 	"gathering_reward": -10,
 	"hunting_reward": 10,
-	"death_by_hunger_reward": -1,
+	"death_by_hunger_reward": 0,
 	"experimentation_factor": 60,
 	"experimentation_factor_decay": 1,
 	"max_hunt_per_day": 1
