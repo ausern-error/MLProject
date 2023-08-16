@@ -224,7 +224,7 @@ class SimulationView(arcade.View):
             self.arcade_texture_list[texture].size = (texture_list[texture]["width"],texture_list[texture]["height"])
         self.clock = clock.Clock(5)
         self.entity_manager = entity_structures.EntityManager(list(),entity_structures.Vector2(MAP_WIDTH,MAP_HEIGHT),self.clock,stats)
-        
+        self.simulation_texture = arcade.load_texture(os.path.join(self.path_to_data,"texture","SpriteTexture","simulation_background.jpg"))
         self.resource_manager = resources.ResourceManager(self.path_to_data)
         for path in os.listdir(os.path.join(self.path_to_data, "animals")):
             with open(os.path.join(self.path_to_data, "animals",path)) as animal:
@@ -232,25 +232,15 @@ class SimulationView(arcade.View):
                 stats.populations[decoded_animal["animal_type"]] = 0
                 stats.populations_per_day[decoded_animal["animal_type"]] = list()
                 entity_structures.Animal.load(decoded_animal,self.entity_manager)
-        self.simulation_background = entity_structures.Entity(entity_structures.Vector2(0,0),self.entity_manager,"simulation_background")
         #event manager
         self.event_manager = event_manager.EventManager(self.entity_manager,self.resource_manager,self.clock,MAP_WIDTH,MAP_HEIGHT)
-
-
-    def setup(self):
-        self.fps_text = arcade.Text(
-            text=f"FPS:{round(arcade.get_fps())}",
-            start_x=10, start_y=1049,
-            color=arcade.color.ALMOND
-        )
-
-    def on_show_view(self):
-        self.setup()
 
     def on_draw(self):
         self.clear()
         arcade.start_render()
-        self.camera.use()
+        #self.camera.use()
+        arcade.draw_texture_rectangle(
+            self.window.width / 2, self.window.height / 2, self.window.width, self.window.height, self.simulation_texture)
         #TODO: OPTIMISE THIS
         for entity in self.entity_manager.entities:
             if entity.texture_name in self.arcade_texture_list:
@@ -264,15 +254,22 @@ class SimulationView(arcade.View):
 
         text = "" 
         for animal_name,animal_population in self.stats.populations.items():
-            text +=str(animal_name)+":"+str(animal_population)
-        arcade.Text(text=text,start_x=WINDOW_WIDTH-150,start_y=WINDOW_HEIGHT-30,color=arcade.color.RED).draw()
+            text +=str(animal_name)+": "+str( animal_population) + str(";  ")
+        arcade.Text(text=text, font_size = 20, start_x=WINDOW_WIDTH-740,start_y=WINDOW_HEIGHT-285,color=arcade.color.RED).draw()
         arcade.Text(  # Updates FPS
+<<<<<<< HEAD
+            font_size = 20,
+            text=f"FPS: {round(arcade.get_fps())}",
+            start_x=WINDOW_WIDTH-740, start_y=WINDOW_HEIGHT-245,
+=======
             text=f"FPS:{round(arcade.get_fps())}",
             start_x=0, start_y=0,
+>>>>>>> origin/main
             color=arcade.color.ALMOND).draw()
         arcade.Text(  # current day
-            text="day:" + str(self.clock.day_counter),
-            start_x=WINDOW_WIDTH-150, start_y=WINDOW_HEIGHT-20,
+            font_size = 20,
+            text="Day Counter: " + str(self.clock.day_counter),
+            start_x=WINDOW_WIDTH-640, start_y=WINDOW_HEIGHT-245,
             color=arcade.color.ALMOND).draw()
     def on_update(self, delta_time):
         for entity in self.entity_manager.entities:

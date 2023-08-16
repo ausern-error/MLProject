@@ -1,5 +1,5 @@
 {
-	"animal_type": "deer",
+	"animal_type": "Deer",
 	"texture": "animal_deer",
     "max_age": 3,
     "max_days_before_reproduction": 1,

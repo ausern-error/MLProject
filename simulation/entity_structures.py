@@ -340,7 +340,7 @@ class Animal(Entity):
         #the snapping doesn't account for the animal's position
         #print("mex:"+str(round(self.position.x)) + ",mey:"+str(round(self.position.y))) 
         #print("goal:"+str(snapped_goal))
-
+        
         if self.position.x > goal.x:
             self.position.x -= self.speed * delta_time
         elif self.position.x < goal.x:
